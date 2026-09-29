@@ -1,0 +1,393 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;700&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ════════════════════════════════
+   LIGHT MODE — High-Contrast Modern Palette
+   ════════════════════════════════ */
+:root {
+  /* ── Page Backgrounds ── */
+  --bg-base:           #FFFFFF;    /* Pure crisp white */
+  --bg-subtle:         #F8FAFC;    /* Light slate-50 wash */
+  --bg-section-purple: #F1F5F9;    /* Clean slate-100 section */
+  --bg-muted:          #F1F5F9;    /* Crisp muted grey */
+  --bg-card:           #FFFFFF;    /* Card white */
+  --bg-card-hover:     #F8FAFC;    /* Card hover */
+  --bg-input:          #FFFFFF;    /* Form input bg */
+  --bg-modal:          #FFFFFF;
+  --bg-dropdown:       #FFFFFF;
+  --bg-tooltip:        #0F172A;    /* Inverted dark tooltip */
+  --bg-code:           #F8FAFC;    /* Code block */
+  --bg-overlay:        rgba(15,23,42,0.60);
+  --bg-nav:            #FFFFFF;    /* Navbar white */
+  --bg-sidebar:        #F8FAFC;    /* Sidebar */
+  --bg-tag:            #EEF2FF;    /* Tag pill background */
+  --bg-skeleton:       #E2E8F0;
+  --bg-skeleton-shine: #F8FAFC;
+  --bg-orange-subtle:  #FEF2F2;    /* Red/Orange CTA tint */
+  --bg-green-subtle:   #ECFDF5;
+  --bg-yellow-subtle:  #FFFBEB;
+  --bg-blue-subtle:    #EFF6FF;
+
+  /* ── Text — High Contrast ── */
+  --text-primary:      #0F172A;    /* Deep slate-900 heading */
+  --text-body:         #334155;    /* Slate-700 readable body */
+  --text-muted:        #64748B;    /* Slate-500 captions */
+  --text-faint:        #94A3B8;    /* Slate-400 placeholders */
+  --text-inverse:      #FFFFFF;    /* On dark backgrounds */
+  --text-tooltip:      #FFFFFF;
+  --text-link:         #4F46E5;    /* Electric Indigo link */
+  --text-link-hover:   #4338CA;
+  --text-code:         #4F46E5;
+
+  /* ── Brand Primary — Electric Indigo / Violet ── */
+  --primary:           #4F46E5;    /* High-energy indigo */
+  --primary-hover:     #4338CA;
+  --primary-active:    #3730A3;
+  --primary-light:     #6366F1;
+  --primary-subtle:    #EEF2FF;    /* Soft indigo tint */
+  --primary-muted:     #E0E7FF;    /* Indigo badge */
+  --primary-text:      #3730A3;
+  --primary-border:    #C7D2FE;
+
+  /* ── Brand Accent — NotepediaX Crimson Red #FF2E2E ── */
+  --accent:            #FF2E2E;    /* Signature NotepediaX Red */
+  --accent-hover:      #E02424;
+  --accent-active:     #C81E1E;
+  --accent-subtle:     #FEF2F2;
+  --accent-text:       #991B1B;
+  --accent-border:     #FECACA;
+
+  /* ── Success / Live Green ── */
+  --success:           #10B981;    /* Emerald-500 */
+  --success-hover:     #059669;
+  --success-subtle:    #ECFDF5;
+  --success-text:      #065F46;
+  --success-border:    #A7F3D0;
+
+  /* ── Warning / Stars ── */
+  --warning:           #F59E0B;    /* Amber-500 */
+  --warning-subtle:    #FFFBEB;
+  --warning-text:      #92400E;
+  --warning-border:    #FDE68A;
+
+  /* ── Danger ── */
+  --danger:            #EF4444;    /* Rose-500 */
+  --danger-subtle:     #FEF2F2;
+  --danger-text:       #991B1B;
+  --danger-border:     #FECACA;
+
+  /* ── Info ── */
+  --info:              #0EA5E9;    /* Sky-500 */
+  --info-subtle:       #F0F9FF;
+  --info-text:         #075985;
+  --info-border:       #BAE6FD;
+
+  /* ── Borders — Sharp & Clean ── */
+  --border-base:       #E2E8F0;    /* Slate-200 */
+  --border-strong:     #CBD5E1;    /* Slate-300 */
+  --border-focus:      #4F46E5;    /* Indigo focus ring */
+  --border-card:       #E2E8F0;
+  --border-divider:    #F1F5F9;
+  --border-input:      #CBD5E1;
+
+  /* ── Shadows ── */
+  --shadow-xs:   0 1px 2px rgba(15,23,42,0.05);
+  --shadow-sm:   0 1px 3px rgba(15,23,42,0.08);
+  --shadow-md:   0 4px 16px rgba(15,23,42,0.08);
+  --shadow-lg:   0 10px 30px rgba(15,23,42,0.10);
+  --shadow-card: 0 2px 8px rgba(15,23,42,0.06);
+  --shadow-nav:  0 2px 8px rgba(15,23,42,0.06);
+  --shadow-focus:0 0 0 3px rgba(79,70,229,0.22);
+  --shadow-accent:0 4px 16px rgba(255,46,46,0.22);
+
+  /* ── Gradients ── */
+  --gradient-primary: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+  --gradient-accent:  linear-gradient(135deg, #FF2E2E 0%, #FF6B6B 100%);
+  --gradient-hero:    linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #FF2E2E 100%);
+  --gradient-card:    linear-gradient(135deg, #F8FAFC 0%, #FFFFFF 100%);
+  --gradient-section: linear-gradient(180deg, #F8FAFC 0%, #FFFFFF 100%);
+
+  /* ── Scrollbar ── */
+  --scrollbar-track:  #F8FAFC;
+  --scrollbar-thumb:  #CBD5E1;
+
+  /* ── Accent Dot Matrix ── */
+  --orange-dot-color: rgba(79, 70, 229, 0.05);
+}
+
+/* ════════════════════════════════
+   DARK MODE — Midnight Obsidian & Luminous Contrast
+   ════════════════════════════════ */
+[data-theme="dark"] {
+  /* ── Page Backgrounds ── */
+  --bg-base:           #0B0F17;    /* Deep midnight obsidian */
+  --bg-subtle:         #111827;    /* Slate-900 */
+  --bg-section-purple: #141D2E;    /* Elevated dark section */
+  --bg-muted:          #162032;    /* Dark muted */
+  --bg-card:           #131B2E;    /* Crisp dark card with distinct surface */
+  --bg-card-hover:     #1A253E;
+  --bg-input:          #111827;
+  --bg-modal:          #131B2E;
+  --bg-dropdown:       #131B2E;
+  --bg-tooltip:        #F8FAFC;    /* Light tooltip */
+  --bg-nav:            #090D15;    /* Darkest nav header */
+  --bg-sidebar:        #0E1422;
+  --bg-tag:            #1E1B4B;
+  --bg-code:           #111827;
+  --bg-overlay:        rgba(0,0,0,0.80);
+  --bg-skeleton:       #1E293B;
+  --bg-skeleton-shine: #334155;
+  --bg-orange-subtle:  #381111;
+  --bg-green-subtle:   #062D1F;
+  --bg-yellow-subtle:  #2D2005;
+  --bg-blue-subtle:    #0A2540;
+
+  /* ── Text — High Clarity & Contrast ── */
+  --text-primary:      #F8FAFC;    /* Bright slate-50 heading (100% crisp) */
+  --text-body:         #CBD5E1;    /* Slate-300 readable body */
+  --text-muted:        #94A3B8;    /* Slate-400 metadata */
+  --text-faint:        #64748B;    /* Slate-500 placeholders */
+  --text-inverse:      #0B0F17;
+  --text-tooltip:      #0F172A;
+  --text-link:         #818CF8;    /* Glowing Indigo link */
+  --text-link-hover:   #A5B4FC;
+  --text-code:         #818CF8;
+
+  /* ── Brand Primary — Electric Indigo ── */
+  --primary:           #6366F1;    /* Luminous Indigo */
+  --primary-hover:     #818CF8;
+  --primary-active:    #A5B4FC;
+  --primary-light:     #818CF8;
+  --primary-subtle:    #1E1B4B;    /* Deep indigo tint */
+  --primary-muted:     #312E81;
+  --primary-text:      #C7D2FE;
+  --primary-border:    #4338CA;
+
+  /* ── Brand Accent — Vivid NotepediaX Red ── */
+  --accent:            #FF4D4D;    /* Vivid bright red */
+  --accent-hover:      #FF6B6B;
+  --accent-active:     #FF8787;
+  --accent-subtle:     #3B1212;
+  --accent-text:       #FECACA;
+  --accent-border:     #7F1D1D;
+
+  /* ── Success / Green ── */
+  --success:           #34D399;    /* Bright Emerald */
+  --success-hover:     #10B981;
+  --success-subtle:    #064E3B;
+  --success-text:      #A7F3D0;
+  --success-border:    #047857;
+
+  /* ── Warning ── */
+  --warning:           #FBBF24;    /* Vivid Amber */
+  --warning-subtle:    #451A03;
+  --warning-text:      #FDE68A;
+  --warning-border:    #B45309;
+
+  /* ── Danger ── */
+  --danger:            #F87171;    /* Bright Rose */
+  --danger-subtle:     #450A0A;
+  --danger-text:       #FCA5A5;
+  --danger-border:     #991B1B;
+
+  /* ── Info ── */
+  --info:              #38BDF8;    /* Electric Sky */
+  --info-subtle:       #082F49;
+  --info-text:         #BAE6FD;
+  --info-border:       #0369A1;
+
+  /* ── Borders — Defined & Visible ── */
+  --border-base:       #1E293B;    /* Slate-800 distinct border */
+  --border-strong:     #334155;    /* Slate-700 */
+  --border-focus:      #6366F1;
+  --border-card:       #1E293B;
+  --border-divider:    #162032;
+  --border-input:      #334155;
+
+  /* ── Shadows ── */
+  --shadow-xs:   0 1px 2px rgba(0,0,0,0.6);
+  --shadow-sm:   0 1px 4px rgba(0,0,0,0.7);
+  --shadow-md:   0 4px 16px rgba(0,0,0,0.8);
+  --shadow-lg:   0 8px 32px rgba(0,0,0,0.85);
+  --shadow-card: 0 2px 8px rgba(0,0,0,0.7);
+  --shadow-nav:  0 2px 8px rgba(0,0,0,0.7);
+  --shadow-focus:0 0 0 3px rgba(99,102,241,0.40);
+  --shadow-accent:0 4px 16px rgba(255,77,77,0.30);
+
+  /* ── Gradients ── */
+  --gradient-primary: linear-gradient(135deg, #4F46E5 0%, #6366F1 100%);
+  --gradient-accent:  linear-gradient(135deg, #FF4D4D 0%, #FF7676 100%);
+  --gradient-hero:    linear-gradient(135deg, #3730A3 0%, #6366F1 50%, #FF4D4D 100%);
+  --gradient-card:    linear-gradient(135deg, #131B2E 0%, #1A253E 100%);
+  --gradient-section: linear-gradient(180deg, #111827 0%, #0B0F17 100%);
+
+  /* ── Scrollbar ── */
+  --scrollbar-track:  #0B0F17;
+  --scrollbar-thumb:  #334155;
+
+  /* ── Accent Dot Matrix ── */
+  --orange-dot-color: rgba(99, 102, 241, 0.07);
+}
+
+html {
+  scroll-behavior: smooth;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: var(--bg-base);
+  color: var(--text-body);
+}
+
+body {
+  background-color: var(--bg-base);
+  background-image: radial-gradient(var(--orange-dot-color) 1.5px, transparent 1.5px);
+  background-size: 24px 24px;
+  color: var(--text-body);
+  min-height: 100vh;
+}
+
+/* global transition for theme switch on every element */
+*, *::before, *::after {
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    fill 0.25s ease;
+}
+
+h1, h2, h3, h4, h5, h6, .font-display {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+code, pre, .font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
+/* selection */
+::selection {
+  background-color: #6D366C;
+  color: #FFFFFF;
+}
+
+/* focus outline visible */
+:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+/* Noise overlay */
+.noise-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  content: "";
+  opacity: 0.015;
+  z-index: 9999;
+  pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Glow orbs background details */
+.cosmic-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.05;
+  pointer-events: none;
+  z-index: 0;
+}
+[data-theme="dark"] .cosmic-orb {
+  opacity: 0.1;
+}
+
+/* Shimmer overlay for skeleton sweep */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-skeleton) 25%,
+    var(--bg-skeleton-shine) 50%,
+    var(--bg-skeleton) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Custom interactive cursor tracking styles */
+.cursor-dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--accent);
+  border-radius: 50%;
+  position: fixed;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 10000;
+  transition: width 0.2s, height 0.2s;
+  box-shadow: 0 0 10px var(--accent);
+}
+
+.cursor-ring {
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(255, 105, 61, 0.3);
+  border-radius: 50%;
+  position: fixed;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 9999;
+  transition: width 0.3s, height 0.3s, border-color 0.3s;
+}
+
+.cursor-active .cursor-dot {
+  width: 12px;
+  height: 12px;
+  background-color: var(--primary);
+  box-shadow: 0 0 15px var(--primary);
+}
+
+.cursor-active .cursor-ring {
+  width: 48px;
+  height: 48px;
+  border-color: rgba(109, 54, 108, 0.6);
+  background-color: rgba(109, 54, 108, 0.05);
+}
+
+/* Glassmorphism Container */
+.cosmic-glass {
+  background: rgba(var(--bg-card), 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-base);
+}
+
+.cosmic-glass:hover {
+  border-color: var(--primary);
+}
