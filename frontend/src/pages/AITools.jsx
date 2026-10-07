@@ -42,6 +42,7 @@ import toast from 'react-hot-toast';
 import GlassCard from '../components/ui/GlassCard';
 import GlowButton from '../components/ui/GlowButton';
 import TypewriterText from '../components/ui/TypewriterText';
+import { useAuth } from '../context/AuthContext';
 
 // Grounded Citations & Tool Outputs
 
@@ -57,6 +58,8 @@ import TranslatorOutput from '../components/ai/ToolOutputs/TranslatorOutput';
 import VoiceExplainerOutput from '../components/ai/ToolOutputs/VoiceExplainerOutput';
 
 export default function AITools() {
+  const { user } = useAuth();
+  const isElite = user?.role === 'elite_student';
   const [selectedTool, setSelectedTool] = useState(null);
   const [promptInput, setPromptInput] = useState('');
   const [generating, setGenerating] = useState(false);
@@ -235,7 +238,7 @@ export default function AITools() {
     e.preventDefault();
     if (!promptInput.trim()) return;
 
-    if (queriesLeft <= 0) {
+    if (!isElite && queriesLeft <= 0) {
       toast.error('Daily AI credits reached! Upgrade for unlimited access.');
       return;
     }
@@ -257,7 +260,9 @@ export default function AITools() {
     setTimeout(() => {
       setGenerating(false);
       setHasOutput(true);
-      setQueriesLeft((prev) => Math.max(0, prev - 1));
+      if (!isElite) {
+        setQueriesLeft((prev) => Math.max(0, prev - 1));
+      }
       toast.success('Generation complete & grounded against syllabus notes!');
     }, 1200);
   };
@@ -325,19 +330,19 @@ export default function AITools() {
                 <Zap className="h-3.5 w-3.5 text-brand-orange" />
                 DAILY AI CREDITS
               </span>
-              <span className="text-brand-primary font-extrabold">{queriesLeft} / 5 Left</span>
+              <span className="text-brand-primary font-extrabold">{isElite ? 'Unlimited' : `${queriesLeft} / 5 Left`}</span>
             </div>
             
             <div className="w-full bg-brand-base h-2.5 rounded-full overflow-hidden border border-brand-border mt-2.5">
               <div 
                 className="h-full bg-gradient-to-r from-brand-primary to-brand-orange transition-all duration-500 shadow-sm" 
-                style={{ width: `${(queriesLeft / 5) * 100}%` }} 
+                style={{ width: isElite ? '100%' : `${(queriesLeft / 5) * 100}%` }} 
               />
             </div>
 
             <div className="flex justify-between items-center text-[10px] text-brand-dim mt-2 font-mono">
-              <span>{queriesLeft === 0 ? 'Limit reached' : 'Free tier'}</span>
-              <span>Refreshes 12:00 AM IST</span>
+              <span>{isElite ? 'Elite tier' : queriesLeft === 0 ? 'Limit reached' : 'Free tier'}</span>
+              <span>{isElite ? 'Always Active' : 'Refreshes 12:00 AM IST'}</span>
             </div>
           </div>
 
@@ -566,7 +571,7 @@ export default function AITools() {
                 </div>
 
                 <div className="pt-2 border-t border-brand-border/60 flex items-center justify-between text-[10px] font-mono text-brand-dim font-bold">
-                  <span>Credits Left: {queriesLeft} / 5</span>
+                  <span>Credits Left: {isElite ? 'Unlimited' : `${queriesLeft} / 5`}</span>
                   <span className="text-brand-primary">{selectedTool.modelType.split(' ')[0]}</span>
                 </div>
 
