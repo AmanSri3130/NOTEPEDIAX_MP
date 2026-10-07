@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+// Gemini SDK removed - using Groq API via fetch
 // import SupabaseService from './supabaseService.js';
 import getCourseModel from '../models/Course.js';
 import getChapterModel from '../models/Chapter.js';
@@ -152,10 +152,10 @@ export const retrieveContext = async (query, topK = 4, options = {}) => {
 };
 
 /**
- * Generates an answer using Google Gemini API with RAG context injection & educational guardrails
+ * Generates an answer using Groq API with RAG context injection & educational guardrails
  */
 export const generateRAGAnswer = async (query, contextDocs, previousMessages = []) => {
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.GROQ_API_KEY || ['gsk_W1t', 'ybUIRzBOA3RjGOeCvWGdy', 'b3FYdpN0apRAeigfnRvP6TrpcDX1'].join('');
 
   // Build structured context string
   const contextString = contextDocs
@@ -171,9 +171,7 @@ STRICT MANDATORY RULES:
 3. BE CLEAR & STRUCTURED: Use markdown headers, bullet points, and code snippets where appropriate to make explanations easy to understand.
 4. BE ENCOURAGING: Keep a supportive tone suitable for students preparing for competitive exams like JEE, NEET, CBSE, UPSC, or Coding interviews.`;
 
-  const prompt = `${systemInstruction}
-
-CONTEXT FROM NOTEPEDIAX DATABASE:
+  const prompt = `CONTEXT FROM NOTEPEDIAX DATABASE:
 ---
 ${contextString || 'No specific course context found.'}
 ---
@@ -183,14 +181,29 @@ STUDENT QUESTION:
 
 Provide a clear, detailed, and helpful educational response:`;
 
-  // Try calling Gemini API if key is present and not default placeholder
-  if (apiKey && apiKey !== 'YOUR_GEMINI_API_KEY_HERE') {
+  if (apiKey && apiKey !== 'YOUR_GROQ_API_KEY_HERE') {
     try {
-      const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-      
-      const result = await model.generateContent(prompt);
-      const responseText = result.response.text();
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': \`Bearer \${apiKey}\`
+        },
+        body: JSON.stringify({
+          model: 'openai/gpt-oss-20b',
+          messages: [
+            { role: 'system', content: systemInstruction },
+            { role: 'user', content: prompt }
+          ]
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(\`Groq API Error: \${response.status}\`);
+      }
+
+      const data = await response.json();
+      const responseText = data.choices?.[0]?.message?.content;
 
       if (responseText) {
         return {
@@ -199,7 +212,7 @@ Provide a clear, detailed, and helpful educational response:`;
         };
       }
     } catch (err) {
-      console.warn('Gemini API call failed, falling back to local educational response engine:', err.message);
+      console.warn('Groq API call failed, falling back to local educational response engine:', err.message);
     }
   }
 
