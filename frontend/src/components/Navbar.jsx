@@ -65,6 +65,7 @@ export default function Navbar() {
   ];
 
   const aiToolsMenu = [
+    { title: 'Adaptive Learning Hub', subtitle: 'Dynamic mastery & auto study planner', path: '/personalized-learning' },
     { title: 'AI Doubt Solver', subtitle: 'Instant step-by-step logic replies', path: '/ai-tools?tool=doubt' },
     { title: 'AI Note Summariser', subtitle: 'Upload PDFs to extract highlights', path: '/ai-tools?tool=summarise' },
     { title: 'AI Quiz Generator', subtitle: 'Custom mock assessments creator', path: '/ai-tools?tool=quiz' },
@@ -133,6 +134,10 @@ export default function Navbar() {
                 </span>
               </div>
 
+              <Link to="/personalized-learning" className="text-sm font-semibold text-brand-orange hover:text-brand-orange/85 flex items-center gap-1.5 transition-colors">
+                <Sparkles className="h-3.5 w-3.5" />
+                Adaptive Hub
+              </Link>
               <Link to="/mock-test" className="text-sm font-semibold text-brand-muted hover:text-brand-text transition-colors">
                 Mock Tests
               </Link>
@@ -205,6 +210,14 @@ export default function Navbar() {
                       >
                         <LayoutDashboard className="h-4 w-4 text-brand-primary" />
                         Dashboard
+                      </Link>
+                      <Link
+                        to="/personalized-learning"
+                        onClick={() => setDropdownOpen(false)}
+                        className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-xs font-semibold text-brand-text hover:bg-brand-primary-light"
+                      >
+                        <Sparkles className="h-4 w-4 text-brand-orange" />
+                        Adaptive Learning
                       </Link>
                       {(user.role === 'admin' || user.role === 'school_admin') && (
                         <Link
