@@ -1,46 +1,33 @@
 'use client';
-import { SparkIcon } from './Icons';
+import { Sparkles } from 'lucide-react';
 
-export const EXAMPLES = [
-  { emoji: '➗', text: 'Solve 2x² − 5x + 3 = 0 step by step', subject: 'Math' },
-  { emoji: '🚀', text: 'A ball is thrown up at 20 m/s. How high does it go? (g = 10 m/s²)', subject: 'Physics' },
-  { emoji: '💻', text: 'Explain recursion in Python with a simple factorial example', subject: 'Coding' },
-  { emoji: '🧬', text: 'Explain the difference between mitosis and meiosis in a table', subject: 'Biology' },
-  { emoji: '🗣️', text: 'Bhai, Newton ka third law simple Hinglish mein samjhao', subject: 'Physics' },
-  { emoji: '📊', text: 'What is the difference between a debit and a credit in accounting?', subject: 'Commerce' },
-];
-
-/** Empty-state welcome screen with tap-to-try examples. */
-export default function Welcome({ onPick }) {
+/**
+ * Clean, minimal ChatGPT/Claude-style Welcome Screen.
+ */
+export default function Welcome() {
   return (
-    <div className="mx-auto flex max-w-3xl animate-slideUp flex-col items-center px-4 pb-6 pt-8 text-center sm:pt-14">
-      <div className="mb-5 grid h-16 w-16 place-items-center rounded-3xl bg-gradient-to-br from-brand-400 via-brand-600 to-fuchsia-500 text-white shadow-xl shadow-brand-500/30">
-        <SparkIcon size={30} />
-      </div>
-      <h1 className="text-2xl font-extrabold tracking-tight sm:text-4xl">
-        Stuck on a doubt? <span className="bg-gradient-to-r from-brand-500 to-fuchsia-500 bg-clip-text text-transparent">Ask away.</span>
-      </h1>
-      <p className="mt-3 max-w-xl text-sm sm:text-base" style={{ color: 'rgb(var(--muted))' }}>
-        Type, speak, or snap a photo of any question. Get a clear, step-by-step explanation in seconds.
-      </p>
+    <div className="relative mx-auto flex h-full min-h-[50vh] max-w-2xl flex-col items-center justify-center px-4 py-12 text-center select-none">
+      {/* Subtle soft ambient glow */}
+      <div className="hero-radial-glow" aria-hidden="true" />
 
-      <ul className="mt-8 grid w-full gap-3 text-left sm:grid-cols-2">
-        {EXAMPLES.map((ex) => (
-          <li key={ex.text}>
-            <button
-              type="button"
-              onClick={() => onPick(ex)}
-              className="card group flex h-full w-full items-start gap-3 p-4 text-left transition hover:-translate-y-0.5 hover:border-brand-400 hover:shadow-lg"
-            >
-              <span className="text-2xl" aria-hidden>{ex.emoji}</span>
-              <span>
-                <span className="block text-[11px] font-semibold uppercase tracking-wide text-brand-500">{ex.subject}</span>
-                <span className="mt-0.5 block text-sm font-medium leading-snug">{ex.text}</span>
-              </span>
-            </button>
-          </li>
-        ))}
-      </ul>
+      {/* Hero Content */}
+      <div className="relative z-10 flex flex-col items-center max-w-lg animate-fadeIn">
+        {/* Sparkle Badge */}
+        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-violet-500/20 bg-violet-500/10 px-3.5 py-1.5 text-xs font-medium text-violet-400 backdrop-blur-md shadow-sm">
+          <Sparkles size={14} className="text-violet-400" />
+          <span>AI Study Companion</span>
+        </div>
+
+        {/* Hero Title */}
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold tracking-tight text-[var(--color-text-primary)]">
+          How can I help you learn today?
+        </h1>
+
+        {/* Subtitle */}
+        <p className="mt-3 text-sm sm:text-base text-[var(--color-text-secondary)] leading-relaxed max-w-md">
+          Ask a question, upload a problem, or start learning.
+        </p>
+      </div>
     </div>
   );
 }

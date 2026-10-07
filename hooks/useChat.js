@@ -224,6 +224,13 @@ export function useChat({ notesContext, onToast }) {
     setActiveId(id);
   }, []);
 
+  const renameChat = useCallback(
+    (id, newTitle) => {
+      patchChat(id, (c) => ({ ...c, title: newTitle }));
+    },
+    [patchChat]
+  );
+
   const deleteChat = useCallback(
     (id) => {
       if (id === activeId) abortRef.current?.abort();
@@ -259,6 +266,7 @@ export function useChat({ notesContext, onToast }) {
     regenerate,
     newChat,
     selectChat,
+    renameChat,
     deleteChat,
     setFeedback,
   };

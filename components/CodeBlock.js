@@ -1,17 +1,19 @@
 'use client';
 import { Children, isValidElement, useState } from 'react';
-import { CheckIcon, CopyIcon } from './Icons';
+import { Copy, Check, Terminal } from 'lucide-react';
 
-/** Recursively pulls plain text out of React children (rehype-highlight wraps tokens in spans). */
+/** Recursively pulls plain text out of React children */
 function extractText(node) {
   if (node == null || typeof node === 'boolean') return '';
   if (typeof node === 'string' || typeof node === 'number') return String(node);
   if (Array.isArray(node)) return node.map(extractText).join('');
-  if (isValidElement(node)) return extractText(node.props.children);
+  if (isValidElement(node)) return extractText(node.props?.children);
   return '';
 }
 
-/** Renders a fenced code block with a language label and copy button. */
+/**
+ * Fenced code block with mac-like header, language badge, copy status, and clean styling.
+ */
 export default function CodeBlock({ children }) {
   const [copied, setCopied] = useState(false);
 
@@ -24,22 +26,61 @@ export default function CodeBlock({ children }) {
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
-      setTimeout(() => setCopied(false), 1800);
+      setTimeout(() => setCopied(false), 2000);
     } catch {
-      /* clipboard blocked – ignore */
+      /* clipboard blocked */
     }
   };
 
   return (
-    <div className="my-3 overflow-hidden rounded-xl border" style={{ borderColor: 'rgb(var(--border))', background: 'rgb(var(--code-bg))' }}>
-      <div className="flex items-center justify-between px-3 py-1.5 text-xs" style={{ background: 'rgb(var(--code-head))', color: 'rgb(var(--muted))' }}>
-        <span className="font-mono uppercase tracking-wide">{lang}</span>
-        <button type="button" onClick={copy} className="btn-ghost !px-2 !py-1" aria-label={copied ? 'Code copied' : 'Copy code'}>
-          {copied ? <CheckIcon size={14} /> : <CopyIcon size={14} />}
-          {copied ? 'Copied' : 'Copy'}
+    <div
+      className="my-3.5 overflow-hidden rounded-2xl border shadow-md"
+      style={{
+        borderColor: 'var(--color-border)',
+        background: 'var(--code-bg)',
+      }}
+    >
+      {/* Code block header */}
+      <div
+        className="flex items-center justify-between border-b px-4 py-2 text-xs"
+        style={{
+          background: 'var(--code-head)',
+          borderColor: 'var(--color-border)',
+          color: 'var(--color-text-secondary)',
+        }}
+      >
+        <div className="flex items-center gap-2">
+          <Terminal size={13} className="text-violet-400" />
+          <span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
+            {lang}
+          </span>
+        </div>
+
+        <button
+          type="button"
+          onClick={copy}
+          className="btn-ghost !px-2.5 !py-1 text-[11px] hover:text-white rounded-lg"
+          aria-label={copied ? 'Code copied to clipboard' : 'Copy code to clipboard'}
+          title="Copy code"
+        >
+          {copied ? (
+            <>
+              <Check size={13} className="text-emerald-400" />
+              <span className="text-emerald-400 font-medium">Copied!</span>
+            </>
+          ) : (
+            <>
+              <Copy size={13} />
+              <span>Copy</span>
+            </>
+          )}
         </button>
       </div>
-      <pre className="overflow-x-auto p-4 text-[0.82rem] leading-relaxed">{children}</pre>
+
+      {/* Code contents */}
+      <pre className="overflow-x-auto p-4 text-[0.85rem] leading-relaxed font-mono">
+        {children}
+      </pre>
     </div>
   );
 }
