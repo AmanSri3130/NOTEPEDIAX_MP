@@ -1,20 +1,19 @@
-import supabase from '../config/supabase.js';
+import mongoose from 'mongoose';
 
-export const Review = {
-  async find(query = {}) {
-    let q = supabase.from('reviews').select('*');
-    if (query.courseId) q = q.eq('course_id', query.courseId);
-    const { data, error } = await q;
-    if (error) throw error;
-    return data || [];
-  },
+const reviewSchema = new mongoose.Schema({
+  // Auto-migrated schema stub
+  data: { type: mongoose.Schema.Types.Mixed }
+}, { timestamps: true, strict: false });
 
-  async create(data) {
-    const { data: res, error } = await supabase.from('reviews').insert([data]).select().single();
-    if (error) throw error;
-    return res;
-  }
+const Review = mongoose.models.Review || mongoose.model('Review', reviewSchema);
+
+const exportedObj = {
+  findOne: async (query) => await Review.findOne(query),
+  find: async (query) => await Review.find(query),
+  create: async (data) => await Review.create(data),
+  model: Review
 };
 
-export const getReviewModel = () => Review;
-export default Review;
+export const getReviewModel = () => exportedObj;
+
+export default exportedObj;

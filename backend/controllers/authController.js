@@ -25,12 +25,12 @@ export const registerUser = async (req, res) => {
     });
 
     if (user) {
-      generateToken(res, user.id, user.role);
+      generateToken(res, user._id, user.role);
       res.status(201).json({
         success: true,
         data: {
-          _id: user.id,
-          id: user.id,
+          _id: user._id,
+          id: user._id,
           name: user.name,
           email: user.email,
           phone: user.phone,
@@ -55,13 +55,13 @@ export const loginUser = async (req, res) => {
     const user = await User.findOne({ email, phone });
 
     if (user && (await User.matchPassword(password, user.password_hash))) {
-      generateToken(res, user.id, user.role);
+      generateToken(res, user._id, user.role);
 
       res.json({
         success: true,
         data: {
-          _id: user.id,
-          id: user.id,
+          _id: user._id,
+          id: user._id,
           name: user.name,
           email: user.email,
           phone: user.phone,

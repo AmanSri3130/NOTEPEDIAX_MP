@@ -14,7 +14,7 @@ export default function RegisterPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('student');
+  const [role, setRole] = useState('free_student');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -22,7 +22,9 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     const res = await register(name, email, password, role);
-    if (res?.success) {
+    if (res?.success && res?.data?.role) {
+      navigate(`/dashboard/${res.data.role}`);
+    } else if (res?.success) {
       navigate('/dashboard');
     }
     
@@ -101,10 +103,9 @@ export default function RegisterPage() {
               <label className="text-[10px] font-mono text-cosmic-muted uppercase tracking-wider block">Choose Profile Role</label>
               <div className="grid grid-cols-2 gap-2">
                 {[
-                  { id: 'student', label: 'Student', icon: GraduationCap },
-                  { id: 'parent', label: 'Parent', icon: Users },
-                  { id: 'instructor', label: 'Instructor', icon: Briefcase },
-                  { id: 'school_admin', label: 'School Admin', icon: UserCheck }
+                  { id: 'free_student', label: 'Free Student', icon: User },
+                  { id: 'elite_student', label: 'Elite Student', icon: Users },
+                  { id: 'teacher', label: 'Teacher', icon: Briefcase },
                 ].map((item) => {
                   const Icon = item.icon;
                   return (

@@ -1,26 +1,19 @@
-import supabase from '../config/supabase.js';
+import mongoose from 'mongoose';
 
-export const Chapter = {
-  async find(query = {}) {
-    let q = supabase.from('chapters').select('*');
-    if (query.subjectId) q = q.eq('subject_id', query.subjectId);
-    const { data, error } = await q;
-    if (error) throw error;
-    return data || [];
-  },
+const chapterSchema = new mongoose.Schema({
+  // Auto-migrated schema stub
+  data: { type: mongoose.Schema.Types.Mixed }
+}, { timestamps: true, strict: false });
 
-  async findById(id) {
-    const { data, error } = await supabase.from('chapters').select('*').eq('id', id).maybeSingle();
-    if (error && error.code !== 'PGRST116') throw error;
-    return data;
-  },
+const Chapter = mongoose.models.Chapter || mongoose.model('Chapter', chapterSchema);
 
-  async create(data) {
-    const { data: res, error } = await supabase.from('chapters').insert([data]).select().single();
-    if (error) throw error;
-    return res;
-  }
+const exportedObj = {
+  findOne: async (query) => await Chapter.findOne(query),
+  find: async (query) => await Chapter.find(query),
+  create: async (data) => await Chapter.create(data),
+  model: Chapter
 };
 
-export const getChapterModel = () => Chapter;
-export default Chapter;
+export const getChapterModel = () => exportedObj;
+
+export default exportedObj;

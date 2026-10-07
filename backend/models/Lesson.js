@@ -1,26 +1,19 @@
-import supabase from '../config/supabase.js';
+import mongoose from 'mongoose';
 
-export const Lesson = {
-  async find(query = {}) {
-    let q = supabase.from('lessons').select('*');
-    if (query.chapterId) q = q.eq('chapter_id', query.chapterId);
-    const { data, error } = await q;
-    if (error) throw error;
-    return data || [];
-  },
+const lessonSchema = new mongoose.Schema({
+  // Auto-migrated schema stub
+  data: { type: mongoose.Schema.Types.Mixed }
+}, { timestamps: true, strict: false });
 
-  async findById(id) {
-    const { data, error } = await supabase.from('lessons').select('*').eq('id', id).maybeSingle();
-    if (error && error.code !== 'PGRST116') throw error;
-    return data;
-  },
+const Lesson = mongoose.models.Lesson || mongoose.model('Lesson', lessonSchema);
 
-  async create(data) {
-    const { data: res, error } = await supabase.from('lessons').insert([data]).select().single();
-    if (error) throw error;
-    return res;
-  }
+const exportedObj = {
+  findOne: async (query) => await Lesson.findOne(query),
+  find: async (query) => await Lesson.find(query),
+  create: async (data) => await Lesson.create(data),
+  model: Lesson
 };
 
-export const getLessonModel = () => Lesson;
-export default Lesson;
+export const getLessonModel = () => exportedObj;
+
+export default exportedObj;

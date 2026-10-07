@@ -20,7 +20,9 @@ export default function LoginPage() {
     setIsLoading(true);
 
     const res = await login(email, password);
-    if (res?.success) {
+    if (res?.success && res?.data?.role) {
+      navigate(`/dashboard/${res.data.role}`);
+    } else if (res?.success) {
       navigate('/dashboard');
     }
     

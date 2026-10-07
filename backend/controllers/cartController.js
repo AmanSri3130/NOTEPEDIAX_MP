@@ -1,4 +1,4 @@
-import supabase from '../config/supabase.js';
+// Removed supabase import
 
 export const getCart = async (req, res) => {
   const userId = req.user?.id;

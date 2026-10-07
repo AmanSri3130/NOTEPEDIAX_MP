@@ -1,20 +1,19 @@
-import supabase from '../config/supabase.js';
+import mongoose from 'mongoose';
 
-export const NoteOrder = {
-  async findOne(query = {}) {
-    let q = supabase.from('note_orders').select('*');
-    if (query.orderId) q = q.eq('order_id', query.orderId);
-    const { data, error } = await q.maybeSingle();
-    if (error && error.code !== 'PGRST116') throw error;
-    return data;
-  },
+const noteorderSchema = new mongoose.Schema({
+  // Auto-migrated schema stub
+  data: { type: mongoose.Schema.Types.Mixed }
+}, { timestamps: true, strict: false });
 
-  async create(data) {
-    const { data: res, error } = await supabase.from('note_orders').insert([data]).select().single();
-    if (error) throw error;
-    return res;
-  }
+const NoteOrder = mongoose.models.NoteOrder || mongoose.model('NoteOrder', noteorderSchema);
+
+const exportedObj = {
+  findOne: async (query) => await NoteOrder.findOne(query),
+  find: async (query) => await NoteOrder.find(query),
+  create: async (data) => await NoteOrder.create(data),
+  model: NoteOrder
 };
 
-export const getNoteOrderModel = () => NoteOrder;
-export default NoteOrder;
+export const getNoteOrderModel = () => exportedObj;
+
+export default exportedObj;

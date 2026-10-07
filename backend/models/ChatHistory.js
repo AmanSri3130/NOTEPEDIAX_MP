@@ -1,20 +1,19 @@
-import supabase from '../config/supabase.js';
+import mongoose from 'mongoose';
 
-export const ChatHistory = {
-  async find(query = {}) {
-    let q = supabase.from('chat_history').select('*');
-    if (query.userId) q = q.eq('user_id', query.userId);
-    const { data, error } = await q;
-    if (error) throw error;
-    return data || [];
-  },
+const chathistorySchema = new mongoose.Schema({
+  // Auto-migrated schema stub
+  data: { type: mongoose.Schema.Types.Mixed }
+}, { timestamps: true, strict: false });
 
-  async create(data) {
-    const { data: res, error } = await supabase.from('chat_history').insert([data]).select().single();
-    if (error) throw error;
-    return res;
-  }
+const ChatHistory = mongoose.models.ChatHistory || mongoose.model('ChatHistory', chathistorySchema);
+
+const exportedObj = {
+  findOne: async (query) => await ChatHistory.findOne(query),
+  find: async (query) => await ChatHistory.find(query),
+  create: async (data) => await ChatHistory.create(data),
+  model: ChatHistory
 };
 
-export const getChatHistoryModel = () => ChatHistory;
-export default ChatHistory;
+export const getChatHistoryModel = () => exportedObj;
+
+export default exportedObj;

@@ -1,20 +1,19 @@
-import supabase from '../config/supabase.js';
+import mongoose from 'mongoose';
 
-export const ActivityLog = {
-  async find(query = {}) {
-    let q = supabase.from('activity_logs').select('*');
-    if (query.userId) q = q.eq('user_id', query.userId);
-    const { data, error } = await q;
-    if (error) throw error;
-    return data || [];
-  },
+const activitylogSchema = new mongoose.Schema({
+  // Auto-migrated schema stub
+  data: { type: mongoose.Schema.Types.Mixed }
+}, { timestamps: true, strict: false });
 
-  async create(data) {
-    const { data: res, error } = await supabase.from('activity_logs').insert([data]).select().single();
-    if (error) throw error;
-    return res;
-  }
+const ActivityLog = mongoose.models.ActivityLog || mongoose.model('ActivityLog', activitylogSchema);
+
+const exportedObj = {
+  findOne: async (query) => await ActivityLog.findOne(query),
+  find: async (query) => await ActivityLog.find(query),
+  create: async (data) => await ActivityLog.create(data),
+  model: ActivityLog
 };
 
-export const getActivityLogModel = () => ActivityLog;
-export default ActivityLog;
+export const getActivityLogModel = () => exportedObj;
+
+export default exportedObj;

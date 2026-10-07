@@ -1,30 +1,19 @@
-import supabase from '../config/supabase.js';
+import mongoose from 'mongoose';
 
-export const Enrollment = {
-  async find(query = {}) {
-    let q = supabase.from('enrollments').select('*');
-    if (query.userId) q = q.eq('user_id', query.userId);
-    if (query.courseId) q = q.eq('course_id', query.courseId);
-    const { data, error } = await q;
-    if (error) throw error;
-    return data || [];
-  },
+const enrollmentSchema = new mongoose.Schema({
+  // Auto-migrated schema stub
+  data: { type: mongoose.Schema.Types.Mixed }
+}, { timestamps: true, strict: false });
 
-  async findOne(query) {
-    let q = supabase.from('enrollments').select('*');
-    if (query.userId) q = q.eq('user_id', query.userId);
-    if (query.courseId) q = q.eq('course_id', query.courseId);
-    const { data, error } = await q.maybeSingle();
-    if (error && error.code !== 'PGRST116') throw error;
-    return data;
-  },
+const Enrollment = mongoose.models.Enrollment || mongoose.model('Enrollment', enrollmentSchema);
 
-  async create(enrollmentData) {
-    const { data, error } = await supabase.from('enrollments').insert([enrollmentData]).select().single();
-    if (error) throw error;
-    return data;
-  }
+const exportedObj = {
+  findOne: async (query) => await Enrollment.findOne(query),
+  find: async (query) => await Enrollment.find(query),
+  create: async (data) => await Enrollment.create(data),
+  model: Enrollment
 };
 
-export const getEnrollmentModel = () => Enrollment;
-export default Enrollment;
+export const getEnrollmentModel = () => exportedObj;
+
+export default exportedObj;

@@ -1,20 +1,19 @@
-import supabase from '../config/supabase.js';
+import mongoose from 'mongoose';
 
-export const Coupon = {
-  async findOne(query = {}) {
-    let q = supabase.from('coupons').select('*');
-    if (query.code) q = q.eq('code', query.code.toUpperCase());
-    const { data, error } = await q.maybeSingle();
-    if (error && error.code !== 'PGRST116') throw error;
-    return data;
-  },
+const couponSchema = new mongoose.Schema({
+  // Auto-migrated schema stub
+  data: { type: mongoose.Schema.Types.Mixed }
+}, { timestamps: true, strict: false });
 
-  async create(data) {
-    const { data: res, error } = await supabase.from('coupons').insert([data]).select().single();
-    if (error) throw error;
-    return res;
-  }
+const Coupon = mongoose.models.Coupon || mongoose.model('Coupon', couponSchema);
+
+const exportedObj = {
+  findOne: async (query) => await Coupon.findOne(query),
+  find: async (query) => await Coupon.find(query),
+  create: async (data) => await Coupon.create(data),
+  model: Coupon
 };
 
-export const getCouponModel = () => Coupon;
-export default Coupon;
+export const getCouponModel = () => exportedObj;
+
+export default exportedObj;

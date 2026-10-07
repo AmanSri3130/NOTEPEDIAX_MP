@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import SupabaseService from './supabaseService.js';
+// import SupabaseService from './supabaseService.js';
 import getCourseModel from '../models/Course.js';
 import getChapterModel from '../models/Chapter.js';
 import getLessonModel from '../models/Lesson.js';
@@ -107,29 +107,7 @@ export const buildKnowledgeIndex = async (forceRefresh = false) => {
  */
 export const retrieveContext = async (query, topK = 4, options = {}) => {
   // 1. Try fetching from Supabase pgvector / note_chunks if query embedding is provided or if Supabase is connected
-  if (options.queryEmbedding) {
-    try {
-      const vectorResults = await SupabaseService.searchNoteChunksVector({
-        queryEmbedding: options.queryEmbedding,
-        matchThreshold: options.matchThreshold || 0.75,
-        matchCount: topK,
-        examCode: options.examCode || 'JEE_MAIN'
-      });
-      if (vectorResults && vectorResults.length > 0) {
-        return vectorResults.map(chunk => ({
-          id: chunk.id,
-          title: chunk.heading_path || 'NotepediaX Verified Note',
-          type: 'enote',
-          category: options.examCode || 'JEE_MAIN',
-          subject: 'Physics/Math/Chemistry',
-          content: chunk.content,
-          link: `/notes/${chunk.note_id || 'view'}`
-        }));
-      }
-    } catch (supaErr) {
-      console.warn('Supabase RAG vector search notice:', supaErr.message);
-    }
-  }
+  // Supabase Vector Search removed for MongoDB migration
 
   // 2. Fallback to indexing and keyword scoring over educational knowledge base
   const index = await buildKnowledgeIndex();

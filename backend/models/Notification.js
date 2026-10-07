@@ -1,20 +1,19 @@
-import supabase from '../config/supabase.js';
+import mongoose from 'mongoose';
 
-export const Notification = {
-  async find(query = {}) {
-    let q = supabase.from('notifications').select('*');
-    if (query.userId) q = q.eq('user_id', query.userId);
-    const { data, error } = await q;
-    if (error) throw error;
-    return data || [];
-  },
+const notificationSchema = new mongoose.Schema({
+  // Auto-migrated schema stub
+  data: { type: mongoose.Schema.Types.Mixed }
+}, { timestamps: true, strict: false });
 
-  async create(data) {
-    const { data: res, error } = await supabase.from('notifications').insert([data]).select().single();
-    if (error) throw error;
-    return res;
-  }
+const Notification = mongoose.models.Notification || mongoose.model('Notification', notificationSchema);
+
+const exportedObj = {
+  findOne: async (query) => await Notification.findOne(query),
+  find: async (query) => await Notification.find(query),
+  create: async (data) => await Notification.create(data),
+  model: Notification
 };
 
-export const getNotificationModel = () => Notification;
-export default Notification;
+export const getNotificationModel = () => exportedObj;
+
+export default exportedObj;

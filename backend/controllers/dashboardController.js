@@ -1,4 +1,4 @@
-import supabase from '../config/supabase.js';
+// Removed supabase import
 import Course from '../models/Course.js';
 import Lesson from '../models/Lesson.js';
 

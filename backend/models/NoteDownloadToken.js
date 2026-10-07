@@ -1,20 +1,19 @@
-import supabase from '../config/supabase.js';
+import mongoose from 'mongoose';
 
-export const NoteDownloadToken = {
-  async findOne(query = {}) {
-    let q = supabase.from('note_download_tokens').select('*');
-    if (query.token) q = q.eq('token', query.token);
-    const { data, error } = await q.maybeSingle();
-    if (error && error.code !== 'PGRST116') throw error;
-    return data;
-  },
+const notedownloadtokenSchema = new mongoose.Schema({
+  // Auto-migrated schema stub
+  data: { type: mongoose.Schema.Types.Mixed }
+}, { timestamps: true, strict: false });
 
-  async create(data) {
-    const { data: res, error } = await supabase.from('note_download_tokens').insert([data]).select().single();
-    if (error) throw error;
-    return res;
-  }
+const NoteDownloadToken = mongoose.models.NoteDownloadToken || mongoose.model('NoteDownloadToken', notedownloadtokenSchema);
+
+const exportedObj = {
+  findOne: async (query) => await NoteDownloadToken.findOne(query),
+  find: async (query) => await NoteDownloadToken.find(query),
+  create: async (data) => await NoteDownloadToken.create(data),
+  model: NoteDownloadToken
 };
 
-export const getNoteDownloadTokenModel = () => NoteDownloadToken;
-export default NoteDownloadToken;
+export const getNoteDownloadTokenModel = () => exportedObj;
+
+export default exportedObj;

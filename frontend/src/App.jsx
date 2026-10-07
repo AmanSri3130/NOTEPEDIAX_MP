@@ -73,6 +73,14 @@ function AnimatedRoutes() {
         
         {/* Private Dashboards */}
         <Route 
+          path="/dashboard/:role" 
+          element={
+            <ProtectedRoute>
+              <PageTransition><Dashboard /></PageTransition>
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
           path="/dashboard" 
           element={
             <ProtectedRoute>

@@ -1,18 +1,12 @@
-import supabase from './supabase.js';
+import mongoose from 'mongoose';
 
-/**
- * Initializes and verifies Supabase PostgreSQL Database connection on startup
- */
 export const connectDB = async () => {
   try {
-    const { data, error } = await supabase.from('exams').select('count', { count: 'exact', head: true });
-    if (error && error.code !== 'PGRST116') {
-      console.warn(`⚡ Supabase Database Connection Warning: ${error.message}`);
-    } else {
-      console.log('⚡ Supabase PostgreSQL Database initialized and connected successfully!');
-    }
-  } catch (err) {
-    console.error('❌ Supabase initialization error:', err.message);
+    const conn = await mongoose.connect(process.env.MONGO_URI || 'mongodb+srv://notepediax_admin:HqkJJMEmwYBmOIAZ@cluster0.2q25use.mongodb.net/notepediax');
+    console.log(`⚡ MongoDB Connected: ${conn.connection.host}`);
+  } catch (error) {
+    console.error(`❌ MongoDB Connection Error: ${error.message}`);
+    process.exit(1);
   }
 };
 

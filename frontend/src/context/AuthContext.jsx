@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { supabase } from '../config/supabase';
+import api from '../utils/api';
 
 const AuthContext = createContext(null);
 
@@ -8,70 +8,39 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Map a Supabase session/user object to our app's user shape
-  const mapSupabaseUser = (supabaseUser) => {
-    if (!supabaseUser) return null;
-    return {
-      id: supabaseUser.id,
-      _id: supabaseUser.id,
-      email: supabaseUser.email,
-      name: supabaseUser.user_metadata?.name || supabaseUser.email?.split('@')[0] || 'User',
-      role: supabaseUser.user_metadata?.role || 'student',
-      phone: supabaseUser.user_metadata?.phone || null,
-      targetExam: supabaseUser.user_metadata?.targetExam || null,
-      avatarUrl: supabaseUser.user_metadata?.avatar_url || null,
-    };
-  };
-
-  // Listen to auth state changes (handles page refresh, tab switch, etc.)
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session ? mapSupabaseUser(session.user) : null);
-      setLoading(false);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session ? mapSupabaseUser(session.user) : null);
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    const fetchProfile = async () => {
+      try {
+        const { data } = await api.get('/auth/profile');
+        if (data.success) {
+          setUser(data.data);
+        } else {
+          setUser(null);
+        }
+      } catch (error) {
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProfile();
   }, []);
 
-  // ── Register ────────────────────────────────────────────────────────────────
-  const register = async (name, email, password, role = 'student', phone = null, targetExam = null) => {
+  const register = async (name, email, password, role = 'free_student', phone = null, targetExam = null) => {
     try {
       setLoading(true);
-
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: { name, role, phone, targetExam },
-        },
+      const { data } = await api.post('/auth/register', {
+        name, email, password, role, phone, targetExam
       });
 
-      if (error) throw error;
-
-      if (data.user) {
-        // Also insert into our custom users table so backend queries work
-        try {
-          await supabase.from('users').upsert({
-            id: data.user.id,
-            name,
-            email: email.toLowerCase(),
-            role,
-            phone,
-          }, { onConflict: 'id' });
-        } catch (_) { /* non-critical */ }
-
+      if (data.success) {
+        setUser(data.data);
         toast.success('Registration successful! Welcome to Notepediax.');
-        return { success: true };
+        return { success: true, data: data.data };
       }
-
-      return { success: false, message: 'Registration did not complete.' };
+      return { success: false, message: data.message };
     } catch (error) {
-      const msg = error.message || 'Registration failed';
+      const msg = error.response?.data?.message || 'Registration failed';
       toast.error(msg);
       return { success: false, message: msg };
     } finally {
@@ -79,24 +48,19 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // ── Login ───────────────────────────────────────────────────────────────────
   const login = async (email, password) => {
     try {
       setLoading(true);
+      const { data } = await api.post('/auth/login', { email, password });
 
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-
-      if (error) throw error;
-
-      if (data.user) {
-        const mappedUser = mapSupabaseUser(data.user);
-        toast.success(`Welcome back, ${mappedUser.name}!`);
-        return { success: true };
+      if (data.success) {
+        setUser(data.data);
+        toast.success(`Welcome back, ${data.data.name}!`);
+        return { success: true, data: data.data };
       }
-
-      return { success: false, message: 'Login did not complete.' };
+      return { success: false, message: data.message };
     } catch (error) {
-      const msg = error.message || 'Login failed';
+      const msg = error.response?.data?.message || 'Login failed';
       toast.error(msg);
       return { success: false, message: msg };
     } finally {
@@ -104,10 +68,9 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // ── Logout ──────────────────────────────────────────────────────────────────
   const logout = async () => {
     try {
-      await supabase.auth.signOut();
+      await api.post('/auth/logout');
       setUser(null);
       toast.success('Logged out successfully.');
     } catch (error) {

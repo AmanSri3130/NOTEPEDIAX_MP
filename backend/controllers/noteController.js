@@ -1,4 +1,4 @@
-import supabase from '../config/supabase.js';
+// Removed supabase import
 
 export const getNotes = async (req, res) => {
   try {

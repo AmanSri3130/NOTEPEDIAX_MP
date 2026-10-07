@@ -1,27 +1,19 @@
-import supabase from '../config/supabase.js';
+import mongoose from 'mongoose';
 
-export const ENote = {
-  async find(query = {}) {
-    let q = supabase.from('e_notes').select('*');
-    if (query.isFree !== undefined) q = q.eq('is_free', query.isFree);
-    if (query.subject) q = q.eq('subject', query.subject);
-    const { data, error } = await q;
-    if (error) throw error;
-    return data || [];
-  },
+const enoteSchema = new mongoose.Schema({
+  // Auto-migrated schema stub
+  data: { type: mongoose.Schema.Types.Mixed }
+}, { timestamps: true, strict: false });
 
-  async findById(id) {
-    const { data, error } = await supabase.from('e_notes').select('*').eq('id', id).maybeSingle();
-    if (error && error.code !== 'PGRST116') throw error;
-    return data;
-  },
+const ENote = mongoose.models.ENote || mongoose.model('ENote', enoteSchema);
 
-  async create(noteData) {
-    const { data, error } = await supabase.from('e_notes').insert([noteData]).select().single();
-    if (error) throw error;
-    return data;
-  }
+const exportedObj = {
+  findOne: async (query) => await ENote.findOne(query),
+  find: async (query) => await ENote.find(query),
+  create: async (data) => await ENote.create(data),
+  model: ENote
 };
 
-export const getENoteModel = () => ENote;
-export default ENote;
+export const getENoteModel = () => exportedObj;
+
+export default exportedObj;

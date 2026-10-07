@@ -1,21 +1,19 @@
-import supabase from '../config/supabase.js';
+import mongoose from 'mongoose';
 
-export const LessonProgress = {
-  async findOne(query = {}) {
-    let q = supabase.from('lesson_progress').select('*');
-    if (query.userId) q = q.eq('user_id', query.userId);
-    if (query.lessonId) q = q.eq('lesson_id', query.lessonId);
-    const { data, error } = await q.maybeSingle();
-    if (error && error.code !== 'PGRST116') throw error;
-    return data;
-  },
+const lessonprogressSchema = new mongoose.Schema({
+  // Auto-migrated schema stub
+  data: { type: mongoose.Schema.Types.Mixed }
+}, { timestamps: true, strict: false });
 
-  async create(data) {
-    const { data: res, error } = await supabase.from('lesson_progress').insert([data]).select().single();
-    if (error) throw error;
-    return res;
-  }
+const LessonProgress = mongoose.models.LessonProgress || mongoose.model('LessonProgress', lessonprogressSchema);
+
+const exportedObj = {
+  findOne: async (query) => await LessonProgress.findOne(query),
+  find: async (query) => await LessonProgress.find(query),
+  create: async (data) => await LessonProgress.create(data),
+  model: LessonProgress
 };
 
-export const getLessonProgressModel = () => LessonProgress;
-export default LessonProgress;
+export const getLessonProgressModel = () => exportedObj;
+
+export default exportedObj;

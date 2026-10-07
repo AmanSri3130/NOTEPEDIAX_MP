@@ -1,20 +1,19 @@
-import supabase from '../config/supabase.js';
+import mongoose from 'mongoose';
 
-export const ZoomClass = {
-  async find(query = {}) {
-    let q = supabase.from('zoom_classes').select('*');
-    if (query.courseId) q = q.eq('course_id', query.courseId);
-    const { data, error } = await q;
-    if (error) throw error;
-    return data || [];
-  },
+const zoomclassSchema = new mongoose.Schema({
+  // Auto-migrated schema stub
+  data: { type: mongoose.Schema.Types.Mixed }
+}, { timestamps: true, strict: false });
 
-  async create(data) {
-    const { data: res, error } = await supabase.from('zoom_classes').insert([data]).select().single();
-    if (error) throw error;
-    return res;
-  }
+const ZoomClass = mongoose.models.ZoomClass || mongoose.model('ZoomClass', zoomclassSchema);
+
+const exportedObj = {
+  findOne: async (query) => await ZoomClass.findOne(query),
+  find: async (query) => await ZoomClass.find(query),
+  create: async (data) => await ZoomClass.create(data),
+  model: ZoomClass
 };
 
-export const getZoomClassModel = () => ZoomClass;
-export default ZoomClass;
+export const getZoomClassModel = () => exportedObj;
+
+export default exportedObj;

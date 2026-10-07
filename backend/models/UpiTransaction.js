@@ -1,20 +1,19 @@
-import supabase from '../config/supabase.js';
+import mongoose from 'mongoose';
 
-export const UpiTransaction = {
-  async findOne(query = {}) {
-    let q = supabase.from('payments').select('*');
-    if (query.transactionId) q = q.eq('transaction_id', query.transactionId);
-    const { data, error } = await q.maybeSingle();
-    if (error && error.code !== 'PGRST116') throw error;
-    return data;
-  },
+const upitransactionSchema = new mongoose.Schema({
+  // Auto-migrated schema stub
+  data: { type: mongoose.Schema.Types.Mixed }
+}, { timestamps: true, strict: false });
 
-  async create(data) {
-    const { data: res, error } = await supabase.from('payments').insert([data]).select().single();
-    if (error) throw error;
-    return res;
-  }
+const UpiTransaction = mongoose.models.UpiTransaction || mongoose.model('UpiTransaction', upitransactionSchema);
+
+const exportedObj = {
+  findOne: async (query) => await UpiTransaction.findOne(query),
+  find: async (query) => await UpiTransaction.find(query),
+  create: async (data) => await UpiTransaction.create(data),
+  model: UpiTransaction
 };
 
-export const getUpiTransactionModel = () => UpiTransaction;
-export default UpiTransaction;
+export const getUpiTransactionModel = () => exportedObj;
+
+export default exportedObj;

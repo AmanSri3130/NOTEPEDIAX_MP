@@ -1,20 +1,19 @@
-import supabase from '../config/supabase.js';
+import mongoose from 'mongoose';
 
-export const Cart = {
-  async findOne(query = {}) {
-    let q = supabase.from('carts').select('*');
-    if (query.userId) q = q.eq('user_id', query.userId);
-    const { data, error } = await q.maybeSingle();
-    if (error && error.code !== 'PGRST116') throw error;
-    return data;
-  },
+const cartSchema = new mongoose.Schema({
+  // Auto-migrated schema stub
+  data: { type: mongoose.Schema.Types.Mixed }
+}, { timestamps: true, strict: false });
 
-  async create(data) {
-    const { data: res, error } = await supabase.from('carts').insert([data]).select().single();
-    if (error) throw error;
-    return res;
-  }
+const Cart = mongoose.models.Cart || mongoose.model('Cart', cartSchema);
+
+const exportedObj = {
+  findOne: async (query) => await Cart.findOne(query),
+  find: async (query) => await Cart.find(query),
+  create: async (data) => await Cart.create(data),
+  model: Cart
 };
 
-export const getCartModel = () => Cart;
-export default Cart;
+export const getCartModel = () => exportedObj;
+
+export default exportedObj;
