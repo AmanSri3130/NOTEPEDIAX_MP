@@ -44,7 +44,7 @@ import GlowButton from '../components/ui/GlowButton';
 import TypewriterText from '../components/ui/TypewriterText';
 
 // Grounded Citations & Tool Outputs
-import GroundedCitationView from '../components/ai/GroundedCitationView';
+
 import SummarizerOutput from '../components/ai/ToolOutputs/SummarizerOutput';
 import DoubtSolverOutput from '../components/ai/ToolOutputs/DoubtSolverOutput';
 import QuizGeneratorOutput from '../components/ai/ToolOutputs/QuizGeneratorOutput';
@@ -612,12 +612,7 @@ export default function AITools() {
                       {/* Tool Output Specialized Component */}
                       {renderToolOutputComponent()}
 
-                      {/* Layer 7: Grounded Citation Display */}
-                      <GroundedCitationView
-                        confidenceScore={94}
-                        modelUsed={selectedTool.modelType}
-                        pipeline="pgvector HNSW + LangGraph Orchestration"
-                      />
+
                     </motion.div>
                   ) : (
                     <div className="py-20 text-center space-y-2">
