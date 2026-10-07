@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Sparkles, Brain, Check, Copy } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import toast from 'react-hot-toast';
 
 export default function StudyPlannerOutput({ prompt }) {
@@ -24,7 +25,7 @@ export default function StudyPlannerOutput({ prompt }) {
             messages: [
               {
                 role: 'system',
-                content: 'You are an AI Study Planner. Create optimized weekly or daily calendar schedules based on the user\'s targets and exam dates. Format using markdown. Create clear tables or bullet points for time slots. Suggest specific study techniques like Pomodoro where applicable.'
+                content: 'You are an AI Study Planner. Create optimized weekly or daily calendar schedules based on the user\'s targets and exam dates. You MUST format the study plan STRICTLY as a proper Markdown Table (tabular form) with proper time and slots (e.g. columns for Time Slot, Subject, Focus, Resources). Do not generate messy lists. Always present the schedule in a clean, structured table.'
               },
               {
                 role: 'user',
@@ -104,8 +105,8 @@ export default function StudyPlannerOutput({ prompt }) {
              <Brain className="animate-pulse h-4 w-4" /> Generating balanced calendar...
           </div>
         ) : (
-          <div className="prose prose-invert max-w-none prose-sm prose-headings:text-emerald-400 prose-a:text-emerald-500 prose-strong:text-brand-text">
-            <ReactMarkdown>
+          <div className="prose prose-invert max-w-none prose-sm prose-headings:text-emerald-400 prose-a:text-emerald-500 prose-strong:text-brand-text prose-table:border-collapse prose-table:w-full prose-td:border prose-td:border-brand-border prose-th:border prose-th:border-brand-border prose-th:bg-brand-base">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {output}
             </ReactMarkdown>
           </div>

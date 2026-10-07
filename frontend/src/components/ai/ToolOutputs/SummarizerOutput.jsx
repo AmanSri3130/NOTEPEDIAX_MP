@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Sparkles, Brain, Check, Copy } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import toast from 'react-hot-toast';
 
 export default function SummarizerOutput({ prompt }) {
@@ -106,8 +107,8 @@ export default function SummarizerOutput({ prompt }) {
              <Brain className="animate-pulse h-4 w-4" /> Synthesizing high-yield concepts...
           </div>
         ) : (
-          <div className="prose prose-invert max-w-none prose-sm prose-headings:text-pink-400 prose-a:text-pink-500">
-            <ReactMarkdown>
+          <div className="prose prose-invert max-w-none prose-sm prose-headings:text-pink-400 prose-a:text-pink-500 prose-table:border-collapse prose-table:w-full prose-td:border prose-td:border-brand-border prose-th:border prose-th:border-brand-border prose-th:bg-brand-base">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {output}
             </ReactMarkdown>
           </div>

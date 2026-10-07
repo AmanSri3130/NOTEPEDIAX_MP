@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Sparkles, Brain, Check, Copy } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import toast from 'react-hot-toast';
 
 export default function QuizGeneratorOutput({ prompt }) {
@@ -104,8 +105,8 @@ export default function QuizGeneratorOutput({ prompt }) {
              <Brain className="animate-pulse h-4 w-4" /> Formulating challenging questions...
           </div>
         ) : (
-          <div className="prose prose-invert max-w-none prose-sm prose-headings:text-cyan-400 prose-a:text-cyan-500 prose-strong:text-brand-text">
-            <ReactMarkdown>
+          <div className="prose prose-invert max-w-none prose-sm prose-headings:text-cyan-400 prose-a:text-cyan-500 prose-strong:text-brand-text prose-table:border-collapse prose-table:w-full prose-td:border prose-td:border-brand-border prose-th:border prose-th:border-brand-border prose-th:bg-brand-base">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {output}
             </ReactMarkdown>
           </div>
