@@ -25,7 +25,7 @@ export default function FlashcardOutput({ prompt }) {
             messages: [
               {
                 role: 'system',
-                content: 'You are an AI Flashcard Maker. Given the user\'s topic or text, create structured flashcards focusing on active recall. Format EXACTLY like this for every single card:\n\nQ: [Question here]\nA: [Answer here]\n\nDo NOT include introductory text or markdown formatting outside of this Q/A structure. Only output Q: and A: pairs.'
+                content: 'You are an AI Flashcard Maker. Given the user\'s topic or question, create structured flashcards focusing on active recall. If the user asks a direct question, ensure the first flashcard directly answers it. Format EXACTLY like this for every single card:\n\nQ: [Question here]\nA: [Answer here]\n\nDo NOT include introductory text or markdown formatting outside of this Q/A structure. Only output Q: and A: pairs.'
               },
               {
                 role: 'user',
@@ -82,15 +82,16 @@ export default function FlashcardOutput({ prompt }) {
     setFlipped(prev => ({ ...prev, [index]: !prev[index] }));
   };
 
-  // Parse Q&A pairs safely
+  // Parse Q&A pairs safely with string splitting
   const cards = [];
-  const regex = /Q:\s*([^\n]+)(?:\n+A:\s*([^\n]+))?/g;
-  let match;
-  while ((match = regex.exec(output)) !== null) {
-    if (match[1]) {
+  const parts = output.split(/Q:/i);
+  for (let i = 1; i < parts.length; i++) {
+    const section = parts[i];
+    const splitA = section.split(/A:/i);
+    if (splitA.length === 2) {
       cards.push({
-        q: match[1].replace(/\*\*/g, '').trim(),
-        a: match[2] ? match[2].replace(/\*\*/g, '').trim() : '...'
+        q: splitA[0].replace(/[*#]/g, '').trim(),
+        a: splitA[1].replace(/[*#]/g, '').trim()
       });
     }
   }
