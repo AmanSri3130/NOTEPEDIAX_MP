@@ -187,7 +187,7 @@ Provide a clear, detailed, and helpful educational response:`;
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': \`Bearer \${apiKey}\`
+          'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
           model: 'openai/gpt-oss-20b',
@@ -199,7 +199,7 @@ Provide a clear, detailed, and helpful educational response:`;
       });
 
       if (!response.ok) {
-        throw new Error(\`Groq API Error: \${response.status}\`);
+        throw new Error(`Groq API Error: ${response.status}`);
       }
 
       const data = await response.json();
