@@ -9,6 +9,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import CustomCursor from './components/ui/CustomCursor';
 import CosmicLoader from './components/animations/CosmicLoader';
+import NotepediaXChatbot from './modules/notepediax-chatbot';
 
 // Lazy-loaded pages
 const Home = lazy(() => import('./pages/Home'));
@@ -26,6 +27,7 @@ const LiveClass = lazy(() => import('./pages/LiveClass'));
 const Cart = lazy(() => import('./pages/Cart'));
 const Checkout = lazy(() => import('./pages/Checkout'));
 const AdminPayments = lazy(() => import('./pages/admin/Payments'));
+const PersonalizedLearning = lazy(() => import('./pages/PersonalizedLearning'));
 
 // Animated Page HOC
 const PageTransition = ({ children }) => (
@@ -70,6 +72,8 @@ function AnimatedRoutes() {
         <Route path="/courses/:id" element={<PageTransition><CourseDetail /></PageTransition>} />
         <Route path="/notes" element={<PageTransition><Notes /></PageTransition>} />
         <Route path="/ai-tools" element={<PageTransition><AITools /></PageTransition>} />
+        <Route path="/personalized-learning" element={<PageTransition><PersonalizedLearning /></PageTransition>} />
+        <Route path="/dashboard/personalized" element={<PageTransition><PersonalizedLearning /></PageTransition>} />
         
         {/* Private Dashboards */}
         <Route 
@@ -184,6 +188,9 @@ function App() {
           </main>
 
           <Footer />
+
+          {/* Self-Contained AI Chatbot Companion */}
+          <NotepediaXChatbot />
         </div>
       </AuthProvider>
     </Router>
