@@ -9,6 +9,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import CustomCursor from './components/ui/CustomCursor';
 import CosmicLoader from './components/animations/CosmicLoader';
+import NotepediaXChatbot from './modules/notepediax-chatbot';
 
 // Lazy-loaded pages
 const Home = lazy(() => import('./pages/Home'));
@@ -27,6 +28,7 @@ const Cart = lazy(() => import('./pages/Cart'));
 const Checkout = lazy(() => import('./pages/Checkout'));
 const AdminPayments = lazy(() => import('./pages/admin/Payments'));
 const AITutor = lazy(() => import('./pages/AITutor'));
+const PersonalizedLearning = lazy(() => import('./pages/PersonalizedLearning'));
 
 // Animated Page HOC
 const PageTransition = ({ children }) => (
@@ -79,7 +81,8 @@ function AnimatedRoutes() {
             </ProtectedRoute>
           }
         />
-        
+        <Route path="/personalized-learning" element={<PageTransition><PersonalizedLearning /></PageTransition>} />
+        <Route path="/dashboard/personalized" element={<PageTransition><PersonalizedLearning /></PageTransition>} />
         {/* Private Dashboards */}
         <Route 
           path="/dashboard/:role" 
@@ -193,6 +196,9 @@ function App() {
           </main>
 
           <Footer />
+
+          {/* Self-Contained AI Chatbot Companion */}
+          <NotepediaXChatbot theme="auto" />
         </div>
       </AuthProvider>
     </Router>

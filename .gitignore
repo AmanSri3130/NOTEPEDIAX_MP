@@ -39,3 +39,12 @@ Thumbs.db
 
 # Agent scratch / temporary
 .agents/
+
+# Python virtualenvs & cache
+.venv/
+venv/
+ENV/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd

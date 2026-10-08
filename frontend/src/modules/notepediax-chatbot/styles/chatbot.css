@@ -1,0 +1,300 @@
+/* ==========================================================================
+   NotepediaX AI Companion - Dynamic Dark & Light Theme Stylesheet
+   All styles are strictly scoped under .npx-chatbot-root to prevent any style leak.
+   ========================================================================== */
+
+/* Dark Theme Variables (Default) */
+.npx-chatbot-root,
+.npx-chatbot-root.npx-theme-dark {
+  --npx-bg-main: #090d16;
+  --npx-drawer-bg: rgba(11, 15, 25, 0.95);
+  --npx-header-bg: rgba(15, 23, 42, 0.95);
+  --npx-card-bg: rgba(15, 23, 42, 0.85);
+  --npx-border: rgba(255, 255, 255, 0.12);
+  --npx-border-glow: rgba(6, 182, 212, 0.3);
+  --npx-text-main: #f1f5f9;
+  --npx-text-muted: #94a3b8;
+  --npx-text-heading: #ffffff;
+  --npx-msg-ai-bg: rgba(15, 23, 42, 0.95);
+  --npx-msg-ai-border: rgba(51, 65, 85, 0.7);
+  --npx-msg-ai-text: #f8fafc;
+  --npx-msg-user-bg: linear-gradient(135deg, #7c3aed, #4338ca);
+  --npx-msg-user-text: #ffffff;
+  --npx-input-bg: rgba(2, 6, 23, 0.9);
+  --npx-input-border: rgba(51, 65, 85, 0.8);
+  --npx-accent-purple: #8b5cf6;
+  --npx-accent-cyan: #06b6d4;
+  --npx-accent-pink: #ec4899;
+  --npx-md-h1: #f472b6;
+  --npx-md-h2: #ffffff;
+  --npx-md-h3: #38bdf8;
+  --npx-md-code-bg: #0d1117;
+  --npx-md-code-text: #e6edf3;
+  --npx-md-inline-bg: rgba(30, 41, 59, 0.9);
+  --npx-md-inline-text: #22d3ee;
+  --npx-close-btn-bg: rgba(244, 63, 94, 0.15);
+  --npx-close-btn-text: #f43f5e;
+  --npx-close-btn-border: rgba(244, 63, 94, 0.3);
+  --npx-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.85);
+
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  color: var(--npx-text-main);
+  box-sizing: border-box;
+}
+
+/* Light Theme Variables (Daylight Toggle) */
+.npx-chatbot-root.npx-theme-light {
+  --npx-bg-main: #ffffff;
+  --npx-drawer-bg: rgba(255, 255, 255, 0.98);
+  --npx-header-bg: #f8fafc;
+  --npx-card-bg: #ffffff;
+  --npx-border: rgba(0, 0, 0, 0.12);
+  --npx-border-glow: rgba(124, 58, 237, 0.25);
+  --npx-text-main: #0f172a;
+  --npx-text-muted: #475569;
+  --npx-text-heading: #0f172a;
+  --npx-msg-ai-bg: #f1f5f9;
+  --npx-msg-ai-border: #cbd5e1;
+  --npx-msg-ai-text: #0f172a;
+  --npx-msg-user-bg: linear-gradient(135deg, #6d28d9, #0284c7);
+  --npx-msg-user-text: #ffffff;
+  --npx-input-bg: #ffffff;
+  --npx-input-border: #cbd5e1;
+  --npx-accent-purple: #7c3aed;
+  --npx-accent-cyan: #0284c7;
+  --npx-accent-pink: #db2777;
+  --npx-md-h1: #7c3aed;
+  --npx-md-h2: #0f172a;
+  --npx-md-h3: #0284c7;
+  --npx-md-code-bg: #1e293b;
+  --npx-md-code-text: #f8fafc;
+  --npx-md-inline-bg: #e2e8f0;
+  --npx-md-inline-text: #0369a1;
+  --npx-close-btn-bg: #ffe4e6;
+  --npx-close-btn-text: #e11d48;
+  --npx-close-btn-border: #fecdd3;
+  --npx-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.2);
+}
+
+.npx-chatbot-root * {
+  box-sizing: border-box;
+}
+
+/* Floating Launcher Trigger Button */
+.npx-launcher-btn {
+  background: linear-gradient(135deg, #7c3aed 0%, #0284c7 100%);
+  box-shadow: 0 10px 30px rgba(124, 58, 237, 0.45), 0 0 20px rgba(2, 132, 199, 0.3);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  cursor: pointer;
+}
+
+.npx-launcher-btn:hover {
+  transform: scale(1.08) translateY(-2px);
+  box-shadow: 0 14px 40px rgba(124, 58, 237, 0.6), 0 0 30px rgba(2, 132, 199, 0.5);
+}
+
+.npx-launcher-btn:active {
+  transform: scale(0.96);
+}
+
+/* Pulse animation around launcher */
+@keyframes npx-pulse-glow {
+  0% { box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.5); }
+  70% { box-shadow: 0 0 0 18px rgba(6, 182, 212, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(6, 182, 212, 0); }
+}
+
+.npx-launcher-pulse {
+  animation: npx-pulse-glow 2.5s infinite;
+}
+
+/* Glassmorphism Panel */
+.npx-glass-panel {
+  background: var(--npx-drawer-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--npx-border);
+  box-shadow: var(--npx-shadow);
+  color: var(--npx-text-main);
+}
+
+/* Scoped Header */
+.npx-header-bar {
+  background-color: var(--npx-header-bg);
+  border-bottom: 1px solid var(--npx-border);
+}
+
+/* Close Button Prominent Styling */
+.npx-close-btn {
+  background-color: var(--npx-close-btn-bg);
+  color: var(--npx-close-btn-text);
+  border: 1px solid var(--npx-close-btn-border);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.npx-close-btn:hover {
+  background-color: #e11d48;
+  color: #ffffff;
+  border-color: #be123c;
+  transform: scale(1.05);
+}
+
+/* AI Message Bubble */
+.npx-msg-ai-bubble {
+  background-color: var(--npx-msg-ai-bg);
+  border: 1px solid var(--npx-msg-ai-border);
+  color: var(--npx-msg-ai-text);
+}
+
+/* User Message Bubble */
+.npx-msg-user-bubble {
+  background: var(--npx-msg-user-bg);
+  color: var(--npx-msg-user-text);
+}
+
+/* Markdown typography scoped styling */
+.npx-markdown-body p {
+  color: var(--npx-msg-ai-text);
+}
+
+.npx-markdown-body h1 {
+  color: var(--npx-md-h1);
+}
+
+.npx-markdown-body h2 {
+  color: var(--npx-md-h2);
+}
+
+.npx-markdown-body h3 {
+  color: var(--npx-md-h3);
+}
+
+.npx-markdown-body code.npx-inline-code {
+  background-color: var(--npx-md-inline-bg);
+  color: var(--npx-md-inline-text);
+  border: 1px solid var(--npx-border);
+}
+
+.npx-markdown-body .npx-bullet-item {
+  color: var(--npx-msg-ai-text);
+}
+
+/* Code block dark container in both themes for syntax readability */
+.npx-code-block-container {
+  background-color: var(--npx-md-code-bg);
+  color: var(--npx-md-code-text);
+  border: 1px solid var(--npx-border);
+}
+
+/* Input Container */
+.npx-input-bar {
+  background-color: var(--npx-header-bg);
+  border-top: 1px solid var(--npx-border);
+}
+
+.npx-textarea-box {
+  background-color: var(--npx-input-bg);
+  border: 1px solid var(--npx-input-border);
+  color: var(--npx-text-main);
+}
+
+.npx-textarea-box::placeholder {
+  color: var(--npx-text-muted);
+}
+
+/* Card Overrides in Light Mode */
+.npx-theme-light .bg-slate-900\/90,
+.npx-theme-light .bg-slate-900 {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+.npx-theme-light .bg-slate-950\/80,
+.npx-theme-light .bg-slate-950 {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+.npx-theme-light .text-slate-100,
+.npx-theme-light .text-slate-200,
+.npx-theme-light .text-white {
+  color: #0f172a !important;
+}
+
+.npx-theme-light .text-slate-400,
+.npx-theme-light .text-slate-300 {
+  color: #475569 !important;
+}
+
+.npx-theme-light .bg-slate-800\/80,
+.npx-theme-light .bg-slate-800,
+.npx-theme-light .bg-slate-800\/60 {
+  background-color: #f1f5f9 !important;
+  border-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+.npx-theme-light .border-white\/10 {
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+.npx-theme-light .border-slate-700\/60,
+.npx-theme-light .border-slate-700 {
+  border-color: #cbd5e1 !important;
+}
+
+/* Scrollbar Customization */
+.npx-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.npx-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.npx-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 9999px;
+}
+
+.npx-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(6, 182, 212, 0.6);
+}
+
+/* Streaming Cursor Effect */
+@keyframes npx-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.npx-cursor {
+  display: inline-block;
+  width: 7px;
+  height: 15px;
+  background-color: var(--npx-accent-cyan);
+  margin-left: 3px;
+  vertical-align: middle;
+  animation: npx-blink 0.8s infinite;
+  border-radius: 2px;
+}
+
+/* Voice Waveform Visualizer Bar */
+@keyframes npx-wave-bar {
+  0%, 100% { height: 4px; }
+  50% { height: 18px; }
+}
+
+.npx-wave-line {
+  width: 3px;
+  background-color: var(--npx-accent-cyan);
+  border-radius: 3px;
+  animation: npx-wave-bar 1.2s infinite ease-in-out;
+}
+
+.npx-wave-line:nth-child(1) { animation-delay: 0.1s; }
+.npx-wave-line:nth-child(2) { animation-delay: 0.3s; }
+.npx-wave-line:nth-child(3) { animation-delay: 0.2s; }
+.npx-wave-line:nth-child(4) { animation-delay: 0.4s; }
