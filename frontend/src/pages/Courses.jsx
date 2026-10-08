@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { 
-  BookOpen, Search, Star, PlayCircle, Shield, SlidersHorizontal, 
-  ArrowUpDown, Check, ChevronDown, Award, Globe, User, BookMarked, ShoppingCart
+  Search, Star, PlayCircle, SlidersHorizontal,
+  ArrowUpDown, Check, Globe, User, BookMarked, ShoppingCart
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import GlassCard from '../components/ui/GlassCard';
-import GlowButton from '../components/ui/GlowButton';
 import api from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import useCart from '../hooks/useCart';
@@ -33,7 +32,7 @@ export default function Courses() {
     }
     try {
       await addToCart(courseId, 'course').unwrap();
-    } catch (err) {
+    } catch {
       // already handled
     }
   };
@@ -225,7 +224,9 @@ export default function Courses() {
 
         {/* Right Columns: Courses Listings */}
         <div className="col-span-1 lg:col-span-9">
-          {sortedCourses.length === 0 ? (
+          {isLoading ? (
+            <p className="text-center py-16 text-xs text-brand-muted">Loading course catalog...</p>
+          ) : sortedCourses.length === 0 ? (
             <div className="text-center py-16 border border-brand-border rounded-2xl bg-brand-card">
               <BookMarked className="h-10 w-10 text-brand-dim mx-auto" />
               <h3 className="font-display text-sm font-bold text-brand-text mt-3">No Courses Found</h3>
@@ -252,6 +253,11 @@ export default function Courses() {
                     <span className="absolute top-3 left-3 bg-brand-base/90 text-[9px] font-mono text-brand-primary px-2.5 py-1 rounded-full border border-brand-border font-bold">
                       {course.category}
                     </span>
+                    {course.isDemo && (
+                      <span className="absolute bottom-3 left-3 bg-amber-100 text-amber-900 text-[9px] font-mono px-2.5 py-1 rounded-full border border-amber-300 font-bold">
+                        DEMO CONTENT
+                      </span>
+                    )}
 
                     <span className="absolute top-3 right-3 bg-brand-base/90 text-[9px] font-mono text-brand-orange px-2.5 py-1 rounded-full border border-brand-border font-bold flex items-center gap-0.5">
                       <Globe className="h-2.5 w-2.5" />
@@ -268,13 +274,15 @@ export default function Courses() {
                     
                     <div className="flex items-center gap-1.5 text-xs text-brand-muted">
                       <User className="h-3.5 w-3.5 text-brand-primary" />
-                      <span>{course.instructor?.name || course.instructor}</span>
+                      <span>{course.instructor?.name || course.instructor || 'Instructor not listed'}</span>
                     </div>
 
                     {/* Ratings */}
                     <div className="flex items-center gap-1 text-xs text-brand-muted font-mono">
-                      <Star className="h-3.5 w-3.5 fill-current text-brand-yellow" />
-                      <span className="font-bold text-brand-text">{course.rating?.average || 4.5}</span>
+                      {(course.rating?.count || 0) > 0 && <Star className="h-3.5 w-3.5 fill-current text-brand-yellow" />}
+                      <span className="font-bold text-brand-text">
+                        {(course.rating?.count || 0) > 0 ? course.rating.average : 'Not rated'}
+                      </span>
                       <span>({course.enrolledCount || 0} students)</span>
                     </div>
                   </div>
@@ -282,7 +290,9 @@ export default function Courses() {
                   {/* Pricing and Action buy links */}
                   <div className="mt-6 pt-4 border-t border-brand-border flex items-center justify-between shrink-0">
                     <div className="flex flex-col">
-                      <span className="text-[10px] font-mono text-brand-dim uppercase font-semibold">TRIAL PRICE</span>
+                      <span className="text-[10px] font-mono text-brand-dim uppercase font-semibold">
+                        {course.isDemo ? 'DEMO • FREE' : 'TRIAL PRICE'}
+                      </span>
                       <div className="flex items-baseline gap-1">
                         <span className="font-display text-base font-extrabold text-brand-text">₹{course.price}</span>
                         <span className="text-[10px] text-brand-muted line-through">₹{course.mrp}</span>

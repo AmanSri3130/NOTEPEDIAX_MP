@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { 
-  Award, Trophy, Flame, Target, BookOpen, Clock, Calendar, Sparkles, 
-  ArrowUpRight, BookMarked, UserCheck, MessageSquare, Play, Sparkle, ArrowRight, CheckCircle,
+  Award, Trophy, Flame, Target, BookOpen, Calendar, Sparkles,
+  BookMarked, UserCheck, Play, Sparkle,
   Settings, LogOut, Download, ShoppingBag, Video, CheckCircle2, LayoutDashboard
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -10,8 +10,9 @@ import GlassCard from '../components/ui/GlassCard';
 import GlowButton from '../components/ui/GlowButton';
 import AnimatedCounter from '../components/ui/AnimatedCounter';
 import ThemeToggle from '../components/ui/ThemeToggle';
+import AdaptiveStudyPanel from '../components/dashboard/AdaptiveStudyPanel';
+import EliteEmailAgentPanel from '../components/dashboard/EliteEmailAgentPanel';
 import api from '../utils/api';
-import toast from 'react-hot-toast';
 
 export default function Dashboard() {
   const { user, logout } = useAuth();
@@ -36,37 +37,32 @@ export default function Dashboard() {
     return () => clearInterval(timer);
   }, []);
 
-  const loadDashboardData = async () => {
-    try {
-      setLoading(true);
-      
-      // Load stats, resume course, recent logs, heatmap
-      const res = await api.get('/dashboard/overview');
-      if (res.data.success) {
-        setDashboardData(res.data.data);
-      }
-
-      // Load live classes to show upcoming class countdown
-      const classRes = await api.get('/zoom/dashboard-classes');
-      if (classRes.data.success && classRes.data.data.length > 0) {
-        const cls = classRes.data.data[0];
-        setUpcomingClass(cls);
-        
-        // Calculate dynamic countdown in seconds
-        const diffMs = new Date(cls.scheduledAt) - new Date();
-        if (diffMs > 0) {
-          setTimeLeft(Math.floor(diffMs / 1000));
-        }
-      }
-    } catch (err) {
-      console.error('Error fetching dashboard summary:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    loadDashboardData();
+    const loadDashboardData = async () => {
+      try {
+        const res = await api.get('/dashboard/overview');
+        if (res.data.success) {
+          setDashboardData(res.data.data);
+        }
+
+        const classRes = await api.get('/zoom/dashboard-classes');
+        if (classRes.data.success && classRes.data.data.length > 0) {
+          const cls = classRes.data.data[0];
+          setUpcomingClass(cls);
+
+          const diffMs = new Date(cls.scheduledAt) - new Date();
+          if (diffMs > 0) {
+            setTimeLeft(Math.floor(diffMs / 1000));
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching dashboard summary:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void loadDashboardData();
   }, []);
 
   // Compute 12-week study heatmap grid (84 blocks total)
@@ -256,6 +252,13 @@ export default function Dashboard() {
             ))}
           </div>
         </div>
+      )}
+
+      {user?.role === 'elite_student' && (
+        <>
+          <AdaptiveStudyPanel />
+          <EliteEmailAgentPanel />
+        </>
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">

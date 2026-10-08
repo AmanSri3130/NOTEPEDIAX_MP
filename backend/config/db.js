@@ -2,7 +2,10 @@ import mongoose from 'mongoose';
 
 export const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGO_URI || 'mongodb+srv://notepediax_admin:HqkJJMEmwYBmOIAZ@cluster0.2q25use.mongodb.net/notepediax');
+    if (!process.env.MONGO_URI) {
+      throw new Error('MONGO_URI is required.');
+    }
+    const conn = await mongoose.connect(process.env.MONGO_URI);
     console.log(`⚡ MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
     console.error(`❌ MongoDB Connection Error: ${error.message}`);

@@ -1,0 +1,16 @@
+# =============================================================================
+# NotepediaX Engine — Python Dependencies (Phase 1, 2 & 3)
+# =============================================================================
+fastapi>=0.111.0,<1.0.0
+uvicorn[standard]>=0.30.0,<1.0.0
+pydantic>=2.7.0,<3.0.0
+pydantic-settings>=2.3.0,<3.0.0
+pymongo[srv]>=4.7.0,<5.0.0
+python-dotenv>=1.0.0,<2.0.0
+httpx>=0.27.0,<1.0.0
+# Phase 2 — Feature engineering & retention math
+numpy>=1.26.0,<3.0.0
+pandas>=2.2.0,<3.0.0
+# Phase 3 — ML ranking & recommendation models
+scikit-learn>=1.4.0,<2.0.0
+lightgbm>=4.3.0,<5.0.0

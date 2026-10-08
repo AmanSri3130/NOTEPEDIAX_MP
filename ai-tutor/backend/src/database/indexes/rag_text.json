@@ -1,0 +1,32 @@
+{
+  "name": "rag_text",
+  "type": "search",
+  "collectionName": "ragchunks",
+  "database": "rag_database",
+  "mappings": {
+    "dynamic": false,
+    "fields": {
+      "content": {
+        "type": "string"
+      },
+      "metadataPrefix": {
+        "type": "string"
+      },
+      "topic": {
+        "type": "string"
+      },
+      "classLevel": {
+        "type": "string",
+        "indexOptions": "docs"
+      },
+      "subject": {
+        "type": "string",
+        "indexOptions": "docs"
+      },
+      "language": {
+        "type": "string",
+        "indexOptions": "docs"
+      }
+    }
+  }
+}

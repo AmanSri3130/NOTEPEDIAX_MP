@@ -1,10 +1,10 @@
-import React from 'react';
 import { XCircle, HelpCircle, ArrowLeft, RefreshCcw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import GlowButton from '../../components/ui/GlowButton';
 
-export default function PaymentFailed({ rejectionReason, onRetry }) {
+export default function PaymentFailed({ rejectionReason, onRetry, status = 'failed' }) {
   const navigate = useNavigate();
+  const expired = status === 'expired';
 
   return (
     <div className="max-w-xl mx-auto bg-bg-card border border-border-base rounded-3xl p-6 sm:p-8 shadow-2xl text-center space-y-6 relative overflow-hidden select-none">
@@ -18,25 +18,27 @@ export default function PaymentFailed({ rejectionReason, onRetry }) {
 
       <div className="space-y-2">
         <span className="text-[10px] font-mono text-red-500 bg-red-500/10 px-3.5 py-1.5 rounded-full font-bold uppercase tracking-wider">
-          Transaction Verification Rejected
+          {expired ? 'Checkout Session Expired' : 'Transaction Verification Rejected'}
         </span>
         <h2 className="font-display text-2xl font-black text-text-primary mt-2">
-          Payment Verification Failed
+          {expired ? 'Payment Session Expired' : 'Payment Verification Failed'}
         </h2>
         <p className="text-xs text-text-muted max-w-sm mx-auto leading-relaxed">
-          The transaction proof submitted did not match our system logs or bank settlements.
+          {expired
+            ? 'The payment window expired. Restart checkout to receive a fresh payment session.'
+            : 'The transaction proof submitted did not match our system logs or bank settlements.'}
         </p>
       </div>
 
       {/* Rejection comment display */}
-      <div className="bg-red-500/[0.03] border border-red-500/15 rounded-2xl p-5 text-left font-mono max-w-md mx-auto space-y-2 shadow-inner">
+      {!expired && <div className="bg-red-500/[0.03] border border-red-500/15 rounded-2xl p-5 text-left font-mono max-w-md mx-auto space-y-2 shadow-inner">
         <span className="text-[8px] text-red-400 font-extrabold uppercase tracking-wider block">
           Auditor Comment / Rejection Reason:
         </span>
         <p className="text-xs text-text-primary font-semibold italic">
           "{rejectionReason || 'No comment provided by administrator. Please verify that the transaction ID matches the successful payment in your UPI app.'}"
         </p>
-      </div>
+      </div>}
 
       {/* Retry controls */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md mx-auto pt-2">

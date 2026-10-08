@@ -7,6 +7,8 @@ const eliteStudentSchema = new mongoose.Schema({
   password_hash: { type: String, required: true },
   role: { type: String, default: 'elite_student' },
   targetExam: { type: String },
+  xp: { type: Number, min: 0, default: 0 },
+  level: { type: Number, min: 1, default: 1 },
   // Additional complete details for elite students
   subscriptionType: { type: String, default: 'elite' },
   progress: { type: Object, default: {} },

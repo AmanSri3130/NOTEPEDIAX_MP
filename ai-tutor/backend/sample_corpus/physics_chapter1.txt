@@ -1,0 +1,18 @@
+# Motion in a Straight Line
+
+Kinematics is the branch of mechanics that describes the motion of points, bodies, and systems of bodies without considering the forces that cause them to move.
+
+## Velocity and Acceleration
+
+Velocity is the rate of change of position with respect to time, whereas acceleration is the rate of change of velocity.
+
+$$ v = \frac{dx}{dt} $$
+
+$$ a = \frac{dv}{dt} $$
+
+## Example Problem
+Example: A car travels at a constant velocity of 20 m/s for 10 seconds. What is the total distance covered?
+Solution:
+Given v = 20 m/s, t = 10 s.
+Distance d = v * t
+d = 20 * 10 = 200 meters.

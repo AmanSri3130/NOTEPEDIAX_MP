@@ -1,186 +1,216 @@
-import React from 'react';
-import { 
-  Trophy, Award, Sparkles, TrendingUp, ShieldAlert, Check, 
-  Flame, Crown, Medal, ArrowUp, ArrowDown, User
+import { useCallback, useEffect, useState } from 'react';
+import {
+  CircleAlert,
+  Clock3,
+  Crown,
+  Medal,
+  RefreshCw,
+  TrendingUp,
+  Trophy,
+  UserRound,
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import GlassCard from '../components/ui/GlassCard';
+import api from '../utils/api';
+
+const cohortDetails = {
+  elite_student: {
+    title: 'Elite Student Leaderboard',
+    description: 'Elite students only, ranked by MongoDB-recorded XP and verified course watch time.',
+  },
+  free_student: {
+    title: 'Free Student Leaderboard',
+    description: 'Free students only, ranked by MongoDB-recorded XP and verified course watch time.',
+  },
+};
+
+const formatWatchTime = (seconds) => {
+  const totalMinutes = Math.floor(seconds / 60);
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  if (hours === 0) return `${minutes}m`;
+  return `${hours}h ${minutes}m`;
+};
 
 export default function Leaderboard() {
-  const rankingList = [
-    { 
-      rank: 1, 
-      name: 'Suhail Khan', 
-      xp: '2,450 XP', 
-      level: 'Level 5 Legend', 
-      medal: '🥇', 
-      trend: 'up',
-      color: 'border-brand-yellow/30 bg-gradient-to-tr from-brand-yellow/10 via-brand-card to-transparent shadow-md' 
-    },
-    { 
-      rank: 2, 
-      name: 'Aryan Kumar (You)', 
-      xp: '1,820 XP', 
-      level: 'Level 4 Scholar', 
-      medal: '🥈', 
-      trend: 'none',
-      color: 'border-brand-primary/20 bg-brand-card' 
-    },
-    { 
-      rank: 3, 
-      name: 'Tanya Gupta', 
-      xp: '1,450 XP', 
-      level: 'Level 3 Pro', 
-      medal: '🥉', 
-      trend: 'up',
-      color: 'border-brand-orange/20 bg-brand-card' 
-    },
-    { 
-      rank: 4, 
-      name: 'Preeti Sharma', 
-      xp: '1,120 XP', 
-      level: 'Level 3 Scholar',
-      trend: 'down'
-    },
-    { 
-      rank: 5, 
-      name: 'Amit Singh', 
-      xp: '950 XP', 
-      level: 'Level 2 Intermediate',
-      trend: 'up'
+  const { user } = useAuth();
+  const [rankings, setRankings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [refreshedAt, setRefreshedAt] = useState(null);
+  const cohort = user?.role;
+  const details = cohortDetails[cohort];
+
+  const fetchLeaderboard = useCallback(async (isInitial = false) => {
+    if (!details) {
+      setError('Student leaderboard is available to free and elite student accounts.');
+      setLoading(false);
+      return;
     }
-  ];
+
+    try {
+      const response = await api.get('/leaderboard');
+      setRankings(response.data.data.rankings);
+      setRefreshedAt(response.data.data.refreshedAt);
+      setError('');
+    } catch (requestError) {
+      setError(
+        requestError.response?.data?.message ||
+        'Could not load current student rankings from MongoDB.'
+      );
+    } finally {
+      if (isInitial) setLoading(false);
+    }
+  }, [details]);
+
+  useEffect(() => {
+    let active = true;
+    const refresh = async (initial = false) => {
+      if (!active) return;
+      await fetchLeaderboard(initial);
+    };
+    refresh(true);
+    const interval = window.setInterval(() => refresh(), 15000);
+    return () => {
+      active = false;
+      window.clearInterval(interval);
+    };
+  }, [fetchLeaderboard]);
+
+  const topThree = rankings.slice(0, 3);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8 bg-brand-base min-h-screen text-brand-text transition-colors duration-300">
-      
-      {/* Header Section */}
-      <div className="text-center max-w-3xl mx-auto mb-12">
-        <span className="text-[10px] font-mono text-brand-primary bg-brand-primary-light dark:bg-brand-primary/10 px-3 py-1.5 rounded-full font-bold uppercase tracking-wider">
-          ACADEMIC RATING MATRIX
+    <div className="max-w-7xl mx-auto min-h-screen bg-brand-base px-4 py-12 text-brand-text transition-colors duration-300 sm:px-6 lg:px-8">
+      <header className="mx-auto mb-10 max-w-3xl text-center">
+        <span className="rounded-full bg-brand-primary-light px-3 py-1.5 text-[10px] font-mono font-bold uppercase tracking-wider text-brand-primary dark:bg-brand-primary/10">
+          Live MongoDB standings · {cohort === 'elite_student' ? 'Elite cohort' : 'Free cohort'}
         </span>
-        <h1 className="font-display text-3xl sm:text-5xl font-extrabold text-brand-text mt-3">
-          XP Rank{' '}
-          <span className="bg-gradient-to-r from-brand-primary via-brand-orange to-brand-primary bg-clip-text text-transparent">
-            Podium
-          </span>
+        <h1 className="mt-4 font-display text-3xl font-extrabold sm:text-5xl">
+          {details?.title || 'Student Leaderboard'}
         </h1>
-        <p className="text-brand-muted text-xs sm:text-sm mt-3 max-w-xl mx-auto leading-relaxed">
-          Unlock weekly bonuses, compete in mock drill test series, and download student note packages to claim your Legend badge.
+        <p className="mx-auto mt-3 max-w-xl text-xs leading-relaxed text-brand-muted sm:text-sm">
+          {details?.description || 'Student rankings are restricted to enrolled student accounts.'}
+          {' '}Only students enrolled in at least one course are listed. Rankings refresh every 15 seconds.
         </p>
-      </div>
+      </header>
 
-      {/* Ranks 3D-Like Podium Widget */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end max-w-3xl mx-auto mb-12">
-        
-        {/* Rank 2 (Silver) */}
-        <GlassCard className="p-6 text-center border border-brand-border bg-brand-card h-[220px] flex flex-col justify-between order-2 md:order-1 relative shadow-sm">
-          <div className="absolute top-3 right-3 text-brand-dim text-xs font-mono">#2</div>
-          <div className="space-y-2 flex flex-col items-center">
-            <span className="text-3xl">🥈</span>
-            <div>
-              <h3 className="font-display text-sm font-extrabold text-brand-text mt-1">{rankingList[1].name}</h3>
-              <span className="text-[10px] text-brand-dim block font-mono font-semibold">{rankingList[1].level}</span>
-            </div>
+      <div className="mx-auto max-w-5xl">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-xs font-semibold text-brand-muted">
+            <TrendingUp className="h-4 w-4 text-brand-primary" />
+            {refreshedAt
+              ? `Last refreshed ${new Date(refreshedAt).toLocaleTimeString()}`
+              : 'Waiting for live student records'}
           </div>
-          <div className="pt-3 border-t border-brand-border/60">
-            <span className="font-sora text-sm font-bold text-brand-primary">{rankingList[1].xp}</span>
-          </div>
-        </GlassCard>
-
-        {/* Rank 1 (Gold, Taller Card) */}
-        <GlassCard className="p-6 text-center border-2 border-brand-yellow/30 bg-gradient-to-tr from-brand-yellow/10 via-brand-card to-brand-primary/5 h-[265px] flex flex-col justify-between order-1 md:order-2 relative shadow-md">
-          <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-yellow text-white h-6 w-6 rounded-full flex items-center justify-center shadow">
-            <Crown className="h-3.5 w-3.5 fill-current" />
-          </div>
-          <div className="absolute top-3 right-3 text-brand-yellow text-xs font-mono font-bold">#1</div>
-          
-          <div className="space-y-2 flex flex-col items-center mt-2">
-            <span className="text-4xl">🥇</span>
-            <div>
-              <h3 className="font-display text-base font-extrabold text-brand-text mt-1">{rankingList[0].name}</h3>
-              <span className="text-[10px] text-brand-yellow block font-mono font-bold uppercase tracking-wider">{rankingList[0].level}</span>
-            </div>
-          </div>
-
-          <div className="pt-3 border-t border-brand-border/60">
-            <span className="font-sora text-base font-extrabold text-brand-primary">{rankingList[0].xp}</span>
-          </div>
-        </GlassCard>
-
-        {/* Rank 3 (Bronze) */}
-        <GlassCard className="p-6 text-center border border-brand-border bg-brand-card h-[200px] flex flex-col justify-between order-3 relative shadow-sm">
-          <div className="absolute top-3 right-3 text-brand-dim text-xs font-mono">#3</div>
-          <div className="space-y-2 flex flex-col items-center">
-            <span className="text-3xl">🥉</span>
-            <div>
-              <h3 className="font-display text-sm font-extrabold text-brand-text mt-1">{rankingList[2].name}</h3>
-              <span className="text-[10px] text-brand-dim block font-mono font-semibold">{rankingList[2].level}</span>
-            </div>
-          </div>
-          <div className="pt-3 border-t border-brand-border/60">
-            <span className="font-sora text-sm font-bold text-brand-primary">{rankingList[2].xp}</span>
-          </div>
-        </GlassCard>
-
-      </div>
-
-      {/* Global Rankings Listing Table */}
-      <GlassCard className="max-w-3xl mx-auto p-5 sm:p-6 bg-brand-card border border-brand-border shadow-sm">
-        
-        <div className="flex justify-between items-center border-b border-brand-border pb-4 mb-4">
-          <h3 className="font-display text-sm sm:text-base font-bold text-brand-text flex items-center gap-2">
-            <TrendingUp className="h-4.5 w-4.5 text-brand-primary" />
-            Global Student Leaderboard Standings
-          </h3>
-          <span className="text-[10px] font-mono text-brand-dim font-bold">UPDATED LATEST 10 MINUTES AGO</span>
+          <button
+            type="button"
+            onClick={() => fetchLeaderboard(true)}
+            disabled={loading}
+            className="inline-flex items-center gap-2 rounded-xl border border-brand-border bg-brand-card px-3 py-2 text-xs font-bold text-brand-text hover:border-brand-primary/40 disabled:opacity-50"
+          >
+            <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} />
+            Refresh now
+          </button>
         </div>
 
-        <div className="space-y-2.5">
-          {rankingList.map((student) => (
-            <div 
-              key={student.rank} 
-              className={`flex items-center justify-between p-4 rounded-xl border border-brand-border bg-brand-base/40 hover:border-brand-primary/30 hover:bg-brand-card transition-all`}
-            >
-              <div className="flex items-center gap-4">
-                <span className="font-mono text-xs font-bold text-brand-dim w-6 text-center">
-                  #{student.rank}
-                </span>
+        {error && (
+          <div role="alert" className="mb-4 flex items-start gap-2 rounded-xl border border-red-400/30 bg-red-500/10 p-4 text-sm text-red-600 dark:text-red-300">
+            <CircleAlert className="mt-0.5 h-4 w-4 shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
 
-                <div className="h-8 w-8 rounded-lg bg-brand-primary-light dark:bg-brand-primary/10 flex items-center justify-center text-brand-primary">
-                  <User className="h-4 w-4" />
-                </div>
-
-                <div className="flex flex-col">
-                  <span className="text-xs sm:text-sm font-extrabold text-brand-text">
-                    {student.name}
-                  </span>
-                  <span className="text-[9px] text-brand-dim font-mono">{student.level}</span>
-                </div>
+        {loading ? (
+          <GlassCard className="p-12 text-center text-sm text-brand-muted">
+            Loading enrolled students from MongoDB...
+          </GlassCard>
+        ) : rankings.length === 0 ? (
+          <GlassCard className="p-12 text-center">
+            <Trophy className="mx-auto h-10 w-10 text-brand-dim" />
+            <h2 className="mt-4 text-base font-bold text-brand-text">No enrolled students in this leaderboard yet</h2>
+            <p className="mt-2 text-xs text-brand-muted">
+              Rankings appear when students in this cohort enroll in a course and have recorded XP or watch activity.
+            </p>
+          </GlassCard>
+        ) : (
+          <>
+            {topThree.length > 0 && (
+              <div className="mb-8 grid items-end gap-4 md:grid-cols-3">
+                {topThree.map((student) => (
+                  <GlassCard
+                    key={student.id}
+                    className={`relative flex flex-col items-center justify-between rounded-2xl border p-5 text-center ${
+                      student.rank === 1
+                        ? 'min-h-56 border-amber-400/40 bg-gradient-to-b from-amber-400/15 to-brand-card md:order-2'
+                        : student.rank === 2
+                          ? 'min-h-48 border-slate-400/30 bg-brand-card md:order-1'
+                          : 'min-h-44 border-orange-500/30 bg-brand-card md:order-3'
+                    }`}
+                  >
+                    <span className="absolute right-4 top-3 font-mono text-xs font-bold text-brand-dim">
+                      #{student.rank}
+                    </span>
+                    {student.rank === 1
+                      ? <Crown className="h-7 w-7 text-amber-500" />
+                      : <Medal className={`h-7 w-7 ${student.rank === 2 ? 'text-slate-400' : 'text-orange-500'}`} />}
+                    <div className="mt-3">
+                      <h2 className="font-display text-sm font-extrabold text-brand-text">
+                        {student.name}{String(student.id) === String(user?._id || user?.id) ? ' (You)' : ''}
+                      </h2>
+                      <p className="mt-1 text-[10px] text-brand-muted">
+                        {student.enrolledCourseCount} enrolled {student.enrolledCourseCount === 1 ? 'course' : 'courses'}
+                      </p>
+                    </div>
+                    <div className="mt-4 grid w-full grid-cols-2 gap-2 border-t border-brand-border pt-3">
+                      <span className="text-xs font-extrabold text-brand-primary">{student.xp.toLocaleString()} XP</span>
+                      <span className="text-xs font-bold text-brand-muted">{formatWatchTime(student.watchTimeSeconds)}</span>
+                    </div>
+                  </GlassCard>
+                ))}
               </div>
+            )}
 
-              {/* Ranks medals or trend indicators */}
-              <div className="flex items-center gap-4 text-xs font-mono font-bold">
-                <span className="text-brand-primary font-sora font-semibold">
-                  {student.xp}
+            <GlassCard className="overflow-hidden border border-brand-border bg-brand-card shadow-sm">
+              <div className="flex items-center justify-between gap-3 border-b border-brand-border p-4 sm:p-5">
+                <h2 className="flex items-center gap-2 font-display text-sm font-bold">
+                  <Trophy className="h-4 w-4 text-brand-primary" />
+                  {cohort === 'elite_student' ? 'Elite student standings' : 'Free student standings'}
+                </h2>
+                <span className="text-[10px] font-mono font-bold text-brand-dim">
+                  {rankings.length} enrolled {rankings.length === 1 ? 'student' : 'students'}
                 </span>
-
-                {student.medal ? (
-                  <span className="text-sm shrink-0">{student.medal}</span>
-                ) : (
-                  <div className="flex items-center gap-0.5 text-brand-dim shrink-0">
-                    {student.trend === 'up' && <ArrowUp className="h-3.5 w-3.5 text-brand-green" />}
-                    {student.trend === 'down' && <ArrowDown className="h-3.5 w-3.5 text-brand-orange" />}
-                    <span className="text-[9px] uppercase">{student.trend}</span>
+              </div>
+              <div className="divide-y divide-brand-border/70">
+                {rankings.map((student) => (
+                  <div key={student.id} className="grid grid-cols-[2.5rem_minmax(0,1fr)_5.5rem_5rem] items-center gap-2 px-4 py-3 sm:grid-cols-[3rem_minmax(0,1fr)_8rem_7rem] sm:px-5">
+                    <span className="text-center font-mono text-xs font-bold text-brand-dim">#{student.rank}</span>
+                    <div className="flex min-w-0 items-center gap-3">
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-primary/10 text-brand-primary">
+                        <UserRound className="h-4 w-4" />
+                      </span>
+                      <div className="min-w-0">
+                        <p className="truncate text-xs font-bold text-brand-text">
+                          {student.name}{String(student.id) === String(user?._id || user?.id) ? ' (You)' : ''}
+                        </p>
+                        <p className="text-[10px] text-brand-muted">
+                          {student.enrolledCourseCount} enrolled {student.enrolledCourseCount === 1 ? 'course' : 'courses'}
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-right text-xs font-extrabold text-brand-primary">
+                      {student.xp.toLocaleString()} XP
+                    </span>
+                    <span className="flex items-center justify-end gap-1 text-xs font-semibold text-brand-muted">
+                      <Clock3 className="h-3.5 w-3.5" />
+                      {formatWatchTime(student.watchTimeSeconds)}
+                    </span>
                   </div>
-                )}
+                ))}
               </div>
-
-            </div>
-          ))}
-        </div>
-
-      </GlassCard>
-
+            </GlassCard>
+          </>
+        )}
+      </div>
     </div>
   );
 }

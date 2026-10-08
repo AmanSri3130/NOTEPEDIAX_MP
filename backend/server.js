@@ -22,6 +22,9 @@ import checkoutRoutes from './routes/checkoutRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 import adminPaymentRoutes from './routes/adminPaymentRoutes.js';
 import chatbotRoutes from './routes/chatbotRoutes.js';
+import adaptiveEngineRoutes from './routes/adaptiveEngineRoutes.js';
+import leaderboardRoutes from './routes/leaderboardRoutes.js';
+import emailAgentRoutes from './routes/emailAgentRoutes.js';
 
 
 // Configure DNS fallback for SRV record resolution
@@ -115,6 +118,9 @@ app.use('/api/checkout', checkoutRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/admin/payments', adminPaymentRoutes);
 app.use('/api/chatbot', chatbotRoutes);
+app.use('/api/adaptive-engine', adaptiveEngineRoutes);
+app.use('/api/leaderboard', leaderboardRoutes);
+app.use('/api/email-agent', emailAgentRoutes);
 
 
 // 404 Route handler

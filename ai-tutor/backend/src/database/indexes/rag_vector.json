@@ -1,0 +1,34 @@
+{
+  "name": "rag_vector",
+  "type": "vectorSearch",
+  "collectionName": "ragchunks",
+  "database": "rag_database",
+  "fields": [
+    {
+      "type": "vector",
+      "path": "embedding",
+      "numDimensions": 768,
+      "similarity": "cosine"
+    },
+    {
+      "type": "filter",
+      "path": "classLevel"
+    },
+    {
+      "type": "filter",
+      "path": "subject"
+    },
+    {
+      "type": "filter",
+      "path": "language"
+    },
+    {
+      "type": "filter",
+      "path": "taxonomyIds"
+    },
+    {
+      "type": "filter",
+      "path": "ownerId"
+    }
+  ]
+}

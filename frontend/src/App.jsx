@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from 'react';
+import { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Toaster } from 'react-hot-toast';
@@ -26,6 +26,7 @@ const LiveClass = lazy(() => import('./pages/LiveClass'));
 const Cart = lazy(() => import('./pages/Cart'));
 const Checkout = lazy(() => import('./pages/Checkout'));
 const AdminPayments = lazy(() => import('./pages/admin/Payments'));
+const AITutor = lazy(() => import('./pages/AITutor'));
 
 // Animated Page HOC
 const PageTransition = ({ children }) => (
@@ -70,6 +71,14 @@ function AnimatedRoutes() {
         <Route path="/courses/:id" element={<PageTransition><CourseDetail /></PageTransition>} />
         <Route path="/notes" element={<PageTransition><Notes /></PageTransition>} />
         <Route path="/ai-tools" element={<PageTransition><AITools /></PageTransition>} />
+        <Route
+          path="/ai-tutor"
+          element={
+            <ProtectedRoute>
+              <PageTransition><AITutor /></PageTransition>
+            </ProtectedRoute>
+          }
+        />
         
         {/* Private Dashboards */}
         <Route 

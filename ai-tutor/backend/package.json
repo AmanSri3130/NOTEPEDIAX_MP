@@ -1,0 +1,37 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "dev": "tsx watch src/index.ts",
+    "seed": "tsx src/seed.ts",
+    "check-indexes": "tsx src/check-indexes.ts",
+    "rag:ingest": "tsx src/scripts/ingest.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "commander": "^15.0.0",
+    "dotenv": "^18.0.6",
+    "express": "^5.2.1",
+    "groq-sdk": "^1.6.0",
+    "mathjs": "^15.2.0",
+    "mongodb": "^7.7.0",
+    "mongoose": "^9.11.1",
+    "pdf-parse": "^2.4.5",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/mongoose": "^5.11.96",
+    "@types/node": "^26.6.4",
+    "@types/pdf-parse": "^1.1.5",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}

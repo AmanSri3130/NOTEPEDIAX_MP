@@ -1,25 +1,27 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useCallback, useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { 
-  Play, CheckCircle2, Lock, Sparkles, MessageSquare, ChevronDown, 
-  Settings, Maximize, Volume2, ArrowLeft, Send, Sparkle, Loader, CheckSquare, Award
+import {
+  Play, CheckCircle2, Sparkles, ArrowLeft, Send, Sparkle, Loader, CheckSquare, Award
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import GlassCard from '../components/ui/GlassCard';
 import GlowButton from '../components/ui/GlowButton';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
+import { useAuth } from '../context/AuthContext';
 
 export default function CoursePlayer() {
   const { id } = useParams(); // 'id' contains the course slug
+  const { user } = useAuth();
   const videoRef = useRef(null);
   
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [loadedCourseId, setLoadedCourseId] = useState(null);
   const [courseProgress, setCourseProgress] = useState(null);
   const [lessonProgressMap, setLessonProgressMap] = useState({});
   const [activeLesson, setActiveLesson] = useState(null);
   const [updatingProgress, setUpdatingProgress] = useState(false);
+  const lastReportedVideoTime = useRef(0);
   
   // Celebration State
   const [showCelebration, setShowCelebration] = useState(false);
@@ -33,79 +35,96 @@ export default function CoursePlayer() {
     { role: 'ai', text: "Hello! I am your AI Study Mentor. Paste any equation or doubt from this lecture for step-by-step guidance." }
   ]);
 
-  // Load Course and Progress
-  const loadCourseData = async () => {
-    try {
-      setLoading(true);
-      const courseRes = await api.get(`/courses/${id}`);
-      if (courseRes.data.success) {
-        const courseData = courseRes.data.data;
-        setCourse(courseData);
+  useEffect(() => {
+    if (!id) return;
 
-        // Fetch student progress for this course
-        const progressRes = await api.get(`/dashboard/courses/${courseData._id}/progress`);
-        if (progressRes.data.success) {
-          const progData = progressRes.data.data.progress;
-          setCourseProgress(progData);
-          if (progData.isCompleted && progData.certificateUrl) {
-            setCertificateUrl(progData.certificateUrl);
-          }
-          
-          // Map lesson progresses
-          const pMap = {};
-          progressRes.data.data.lessonProgresses.forEach(lp => {
-            pMap[lp.lesson] = lp;
-          });
-          setLessonProgressMap(pMap);
+    const loadCourseData = async () => {
+      try {
+        const courseRes = await api.get(`/courses/${id}`);
+        if (courseRes.data.success) {
+          const courseData = courseRes.data.data;
+          setCourse(courseData);
 
-          // Find active lesson (first uncompleted, or first lesson)
-          let foundActive = null;
-          if (courseData.chapters && courseData.chapters.length > 0) {
-            for (const chap of courseData.chapters) {
-              if (chap.lessons && chap.lessons.length > 0) {
-                for (const les of chap.lessons) {
-                  if (!progData.completedLessons.includes(les._id)) {
-                    foundActive = les;
-                    break;
+          const progressRes = await api.get(`/dashboard/courses/${courseData._id}/progress`);
+          if (progressRes.data.success) {
+            const progData = progressRes.data.data.progress;
+            setCourseProgress(progData);
+            if (progData.isCompleted && progData.certificateUrl) {
+              setCertificateUrl(progData.certificateUrl);
+            }
+
+            const pMap = {};
+            progressRes.data.data.lessonProgresses.forEach((lp) => {
+              pMap[lp.lesson] = lp;
+            });
+            setLessonProgressMap(pMap);
+
+            let foundActive = null;
+            if (courseData.chapters && courseData.chapters.length > 0) {
+              for (const chapter of courseData.chapters) {
+                if (chapter.lessons && chapter.lessons.length > 0) {
+                  for (const lesson of chapter.lessons) {
+                    if (!progData.completedLessons.includes(lesson._id)) {
+                      foundActive = lesson;
+                      break;
+                    }
                   }
                 }
+                if (foundActive) break;
               }
-              if (foundActive) break;
+              if (!foundActive && courseData.chapters[0].lessons?.length > 0) {
+                foundActive = courseData.chapters[0].lessons[0];
+              }
             }
-            // Fallback to the very first lesson
-            if (!foundActive && courseData.chapters[0].lessons?.length > 0) {
-              foundActive = courseData.chapters[0].lessons[0];
-            }
+            setActiveLesson(foundActive);
           }
-          setActiveLesson(foundActive);
         }
+      } catch (err) {
+        console.error('Error loading course player data:', err);
+        toast.error('Could not load course curriculum progress details');
+      } finally {
+        setLoadedCourseId(id);
+        setLoading(false);
+      }
+    };
+
+    void loadCourseData();
+  }, [id]);
+
+  const handleCompleteCourse = useCallback(async () => {
+    try {
+      setGeneratingCertificate(true);
+      const res = await api.post(`/dashboard/courses/${course._id}/complete`);
+      if (res.data.success) {
+        setCertificateUrl(res.data.certificateUrl);
+        setShowCelebration(true);
       }
     } catch (err) {
-      console.error('Error loading course player data:', err);
-      toast.error('Could not load course curriculum progress details');
+      console.error('Error generating course certificate:', err);
     } finally {
-      setLoading(false);
+      setGeneratingCertificate(false);
     }
-  };
-
-  useEffect(() => {
-    if (id) {
-      loadCourseData();
-    }
-  }, [id]);
+  }, [course]);
 
   // Periodic Progress Tracker (Syncs to server every 10 seconds)
   useEffect(() => {
+    lastReportedVideoTime.current = videoRef.current?.currentTime || 0;
     let interval = null;
     if (activeLesson && videoRef.current) {
       interval = setInterval(async () => {
         const video = videoRef.current;
         if (video && !video.paused && video.duration > 0) {
           try {
+            const currentTime = Math.round(video.currentTime);
+            const elapsedVideoSeconds = currentTime - lastReportedVideoTime.current;
+            lastReportedVideoTime.current = currentTime;
             const res = await api.post('/dashboard/progress/update', {
               lessonId: activeLesson._id,
-              watchedDuration: Math.round(video.currentTime),
-              totalDuration: Math.round(video.duration)
+              watchedDuration: currentTime,
+              totalDuration: Math.round(video.duration),
+              watchedDeltaSeconds: elapsedVideoSeconds > 0 && elapsedVideoSeconds <= 12
+                ? elapsedVideoSeconds
+                : 0,
             });
             if (res.data.success) {
               // Update local state map
@@ -140,7 +159,7 @@ export default function CoursePlayer() {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [activeLesson, courseProgress]);
+  }, [activeLesson, courseProgress, course, handleCompleteCourse]);
 
   // Handle manual complete lesson
   const handleManualComplete = async () => {
@@ -167,26 +186,10 @@ export default function CoursePlayer() {
           }
         }
       }
-    } catch (err) {
+    } catch {
       toast.error('Failed to complete lecture');
     } finally {
       setUpdatingProgress(false);
-    }
-  };
-
-  // Complete course and generate certificate
-  const handleCompleteCourse = async () => {
-    try {
-      setGeneratingCertificate(true);
-      const res = await api.post(`/dashboard/courses/${course._id}/complete`);
-      if (res.data.success) {
-        setCertificateUrl(res.data.certificateUrl);
-        setShowCelebration(true);
-      }
-    } catch (err) {
-      console.error('Error generating course certificate:', err);
-    } finally {
-      setGeneratingCertificate(false);
     }
   };
 
@@ -218,7 +221,7 @@ export default function CoursePlayer() {
     setActiveLesson(lesson);
   };
 
-  if (loading) {
+  if (loading || loadedCourseId !== id) {
     return (
       <div className="min-h-screen bg-cosmic-base flex flex-col items-center justify-center text-cosmic-text">
         <div className="h-10 w-10 border-4 border-cosmic-cyan border-t-transparent rounded-full animate-spin"></div>
@@ -291,7 +294,9 @@ export default function CoursePlayer() {
             ) : (
               <div className="flex flex-col items-center gap-3">
                 <Sparkle className="h-12 w-12 text-cosmic-cyan animate-pulse" />
-                <p className="font-mono text-xs text-cosmic-muted">Live Interactive class. Countdowns schedule details from dashboard.</p>
+                <p className="font-mono text-xs text-cosmic-muted">
+                  {activeLesson.demoDescription || 'Live interactive class. Countdowns schedule details from dashboard.'}
+                </p>
               </div>
             )}
           </div>

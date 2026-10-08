@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CreditCard, ShoppingBag, ShieldCheck, ArrowLeft } from 'lucide-react';
+import { ShoppingBag, ShieldCheck, ArrowLeft } from 'lucide-react';
 import useCart from '../hooks/useCart';
 import usePaymentStatus from '../hooks/usePaymentStatus';
 import api from '../utils/api';
@@ -15,7 +15,7 @@ import PaymentFailed from './checkout/PaymentFailed';
 
 export default function Checkout() {
   const navigate = useNavigate();
-  const { items, subtotal, discountAmount, gstAmount, totalAmount, clearCart, refreshCart } = useCart();
+  const { clearCart, refreshCart } = useCart();
 
   const [loading, setLoading] = useState(true);
   const [orderData, setOrderData] = useState(null);
@@ -85,7 +85,7 @@ export default function Checkout() {
       clearCart();
       refreshCart();
     }
-  }, [paymentStatus]);
+  }, [paymentStatus, clearCart, refreshCart]);
 
   if (loading) {
     return <CosmicLoader />;
@@ -203,9 +203,10 @@ export default function Checkout() {
             />
           )}
 
-          {paymentStatus === 'failed' && (
-            <PaymentFailed 
-              rejectionReason={rejectionReason} 
+          {(paymentStatus === 'failed' || paymentStatus === 'expired') && (
+            <PaymentFailed
+              status={paymentStatus}
+              rejectionReason={rejectionReason}
               onRetry={handleRetry} 
             />
           )}

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { 
-  Smartphone, Monitor, Copy, Check, QrCode, Loader, AlertTriangle, Clock, ArrowRight, ShieldCheck 
+  Copy, Check, QrCode, Loader, AlertTriangle, Clock, ArrowRight, ShieldCheck
 } from 'lucide-react';
 import api from '../../utils/api';
 import toast from 'react-hot-toast';
@@ -13,7 +13,7 @@ export default function PaymentModal({ orderData, onSubmitTxn, isSubmitting }) {
     expiresAt, 
     deepLinks, 
     isMobile,
-    breakdown 
+    upiVpa,
   } = orderData;
 
   const [copied, setCopied] = useState(false);
@@ -24,9 +24,6 @@ export default function PaymentModal({ orderData, onSubmitTxn, isSubmitting }) {
   const [loadingQr, setLoadingQr] = useState(false);
   const [timeLeft, setTimeLeft] = useState(600); // 10 minutes in seconds default
   const [qrError, setQrError] = useState('');
-
-  // Destination VPA
-  const upiVpa = 'notepediax@paytm';
 
   // Session expiry countdown
   useEffect(() => {
@@ -94,7 +91,7 @@ export default function PaymentModal({ orderData, onSubmitTxn, isSubmitting }) {
     navigator.clipboard.writeText(upiVpa).catch(() => {});
     
     // Open deep link
-    window.location.href = deepLink;
+    window.location.assign(deepLink);
   };
 
   const handleSubmit = (e) => {

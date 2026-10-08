@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { 
-  ArrowLeft, Star, Play, CheckCircle, ChevronDown, ChevronUp, Clock, BookOpen, 
-  FileText, Award, HelpCircle, ShieldCheck, Sparkles, User, Users, X, Percent, Wallet, ShoppingCart
+  ArrowLeft, Star, Play, ChevronDown, ChevronUp, Clock, BookOpen,
+  FileText, Award, ShieldCheck, Sparkles, User, ShoppingCart
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
@@ -27,57 +27,6 @@ export default function CourseDetail() {
   const [previewOpen, setPreviewOpen] = useState(false);
   
   const [addingToCartState, setAddingToCartState] = useState(false);
-
-  // Detail dictionary matching our courses (fallback)
-  const staticCourseDetails = {
-    'organic-chem': {
-      title: 'Organic Chemistry: JEE/NEET Advanced Prep',
-      subtitle: 'Complete masterclass on Reaction Mechanisms, Electrophilic Additions, and Carbonyl compounds with ex-IIT expert.',
-      instructor: {
-        name: 'Dr. S. K. Roy',
-        title: 'Senior Chemistry Faculty (Ex-IIT Delhi)',
-        bio: 'Over 15+ years training top 100 JEE/NEET rankers. Author of organic chemistry blueprints.',
-        students: '12,450+',
-        rating: '4.8'
-      },
-      rating: { average: 4.8, count: 240 },
-      enrolledCount: 12450,
-      price: 999,
-      mrp: 2499,
-      duration: '32 hours',
-      totalLessons: 24,
-      notes: 18,
-      tests: 8,
-      chapters: [
-        { title: 'Chapter 1: Basics of Carbon Chains & Hybridization', duration: '4h 12m', lessons: [{ title: 'Hybridization states', duration: 15 }, { title: 'Resonance & Inductive effects', duration: 20 }, { title: 'Acid-Base strength analytics', duration: 18 }] },
-        { title: 'Chapter 2: Nucleophilic Substitution (SN1 vs SN2)', duration: '6h 45m', lessons: [{ title: 'Carbocation configurations', duration: 25 }, { title: 'Concerted SN2 inversion steps', duration: 22 }, { title: 'Solvent & leaving group influences', duration: 30 }] },
-        { title: 'Chapter 3: Elimination Mechanisms (E1 vs E2)', duration: '5h 18m', lessons: [{ title: 'Hofmann vs Saytzeff rules', duration: 30 }, { title: 'Bimolecular eliminations', duration: 28 }, { title: 'Competition between substitution & elimination', duration: 60 }] }
-      ]
-    },
-    'web-dev': {
-      title: 'Full Stack Web Dev (Vite + React + Node.js)',
-      subtitle: 'Build modern production-grade SaaS platforms with React 18, Tailwind CSS, Express, and MongoDB.',
-      instructor: {
-        name: 'Aryan Kumar',
-        title: 'Tech Architect & Founding Engineer',
-        bio: 'Ex-MERN lead at tech startup. Passionate about next-generation high-fidelity UIs.',
-        students: '8,120+',
-        rating: '4.9'
-      },
-      rating: { average: 4.9, count: 180 },
-      enrolledCount: 8120,
-      price: 1299,
-      mrp: 3999,
-      duration: '45 hours',
-      totalLessons: 35,
-      notes: 25,
-      tests: 12,
-      chapters: [
-        { title: 'Chapter 1: Modern Frontend with Vite & React 18', duration: '8h 30m', lessons: [{ title: 'React 18 hooks and lifecycle', duration: 20 }, { title: 'Custom hooks & complex state management', duration: 25 }, { title: 'Framer Motion interactive UI layouts', duration: 30 }] },
-        { title: 'Chapter 2: Core CSS, Tailwind & Styling systems', duration: '7h 15m', lessons: [{ title: 'CSS Variables & custom dark modes', duration: 25 }, { title: 'Flexbox/Grid responsive grids', duration: 35 }] }
-      ]
-    }
-  };
 
   useEffect(() => {
     const fetchCourseDetail = async () => {
@@ -105,10 +54,10 @@ export default function CourseDetail() {
           }
         }
       } catch (error) {
-        console.error('Error fetching course:', error);
-        // Fallback to static mockup
-        const fallback = staticCourseDetails[id] || staticCourseDetails['organic-chem'];
-        setCourse(fallback);
+        if (error.response?.status !== 404) {
+          console.error('Error fetching course:', error);
+        }
+        setCourse(null);
         setCheckingEnrollment(false);
       } finally {
         setLoading(false);
@@ -151,7 +100,7 @@ export default function CourseDetail() {
     setAddingToCartState(true);
     try {
       await addToCart(course._id, 'course').unwrap();
-    } catch (err) {
+    } catch {
       // errors handled by thunk/toast
     } finally {
       setAddingToCartState(false);
@@ -200,7 +149,9 @@ export default function CourseDetail() {
 
   const isPaid = course.price > 0;
   const originalPrice = course.mrp || course.original || (course.price * 2);
-  const discountPercent = Math.round(((originalPrice - course.price) / originalPrice) * 100);
+  const discountPercent = originalPrice > 0
+    ? Math.round(((originalPrice - course.price) / originalPrice) * 100)
+    : 0;
 
   return (
     <div className="bg-brand-base min-h-screen text-brand-text py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
@@ -238,8 +189,10 @@ export default function CourseDetail() {
             {/* Micro rating stats row */}
             <div className="flex items-center gap-4 text-xs font-semibold text-brand-muted border-b border-brand-border pb-6">
               <div className="flex items-center gap-1">
-                <Star className="h-4 w-4 fill-current text-brand-yellow" />
-                <span className="text-brand-text font-bold">{course.rating?.average || 4.5}</span>
+                {(course.rating?.count || 0) > 0 && <Star className="h-4 w-4 fill-current text-brand-yellow" />}
+                <span className="text-brand-text font-bold">
+                  {(course.rating?.count || 0) > 0 ? course.rating.average : 'Not rated yet'}
+                </span>
                 <span>({course.enrolledCount || 0} Students Enrolled)</span>
               </div>
               <span className="text-brand-border">|</span>
@@ -326,13 +279,13 @@ export default function CourseDetail() {
                 </div>
                 <div className="space-y-2 text-center sm:text-left">
                   <h3 className="font-display text-base font-bold text-brand-text">{course.instructor.name}</h3>
-                  <span className="text-xs font-semibold text-brand-primary block">{course.instructor.title || 'Senior Faculty & Subject Matter Expert'}</span>
+                  <span className="text-xs font-semibold text-brand-primary block">{course.instructor.title || 'Instructor'}</span>
                   <p className="text-xs text-brand-muted leading-relaxed max-w-xl">
-                    {course.instructor.bio || 'Author of academic blueprints and mentor to top national rankers with over a decade of excellence.'}
+                    {course.instructor.bio || 'Course instructor.'}
                   </p>
                   <div className="flex flex-wrap justify-center sm:justify-start gap-4 text-xs font-mono text-brand-dim pt-2">
-                    <span>🎓 Trained {course.instructor.students || '10,000+'} Students</span>
-                    <span>⭐ Rated {course.instructor.rating || '4.8'} Avg</span>
+                    <span>🎓 Trained {course.instructor.students || '0'} Students</span>
+                    <span>⭐ {course.instructor.rating ? `Rated ${course.instructor.rating} Avg` : 'Not rated yet'}</span>
                   </div>
                 </div>
               </GlassCard>

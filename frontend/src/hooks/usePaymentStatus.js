@@ -48,8 +48,9 @@ export default function usePaymentStatus(sessionToken) {
           
           if (s !== 'pending' && s !== 'submitted') {
             setStatus(s);
-            if (s === 'verified' && socket) socket.disconnect();
-            if (s === 'verified' && pollInterval) clearInterval(pollInterval);
+            if (res.data.rejectionReason) setRejectionReason(res.data.rejectionReason);
+            if (socket) socket.disconnect();
+            if (pollInterval) clearInterval(pollInterval);
           } else if (s === 'submitted') {
             setStatus('submitted');
           }

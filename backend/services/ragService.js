@@ -155,7 +155,7 @@ export const retrieveContext = async (query, topK = 4, options = {}) => {
  * Generates an answer using Groq API with RAG context injection & educational guardrails
  */
 export const generateRAGAnswer = async (query, contextDocs, previousMessages = []) => {
-  const apiKey = process.env.GROQ_API_KEY || ['gsk_W1t', 'ybUIRzBOA3RjGOeCvWGdy', 'b3FYdpN0apRAeigfnRvP6TrpcDX1'].join('');
+  const apiKey = process.env.GROQ_API_KEY;
 
   // Build structured context string
   const contextString = contextDocs

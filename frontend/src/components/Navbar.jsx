@@ -1,22 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { 
-  Menu, X, Sun, Moon, GraduationCap, ChevronDown, LogOut, 
-  LayoutDashboard, Sparkles, BookOpen, Search, Star, HelpCircle, 
-  Compass, FileText, Bot, Trophy, ArrowRight, ShieldCheck
+  Menu, X, ChevronDown, LogOut,
+  LayoutDashboard, Sparkles, Search,
+  Compass, FileText, Bot, ArrowRight, ShieldCheck, Brain
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useTheme } from '../context/ThemeContext';
 import ThemeToggle from './ui/ThemeToggle';
 import CartIcon from './cart/CartIcon';
 import Logo from './ui/Logo';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
-  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
-  const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeMegaMenu, setActiveMegaMenu] = useState(null); // 'courses' | 'notes' | 'ai' | null
   const [searchOpen, setSearchOpen] = useState(false);
@@ -138,6 +135,9 @@ export default function Navbar() {
               </Link>
               <Link to="/leaderboard" className="text-sm font-semibold text-brand-muted hover:text-brand-text transition-colors">
                 Leaderboard
+              </Link>
+              <Link to="/ai-tutor" className="text-sm font-semibold flex items-center gap-1.5 text-indigo-500 hover:text-indigo-400 transition-colors">
+                <Brain className="h-4 w-4" /> AI Tutor
               </Link>
             </div>
           </div>

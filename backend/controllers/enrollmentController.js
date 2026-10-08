@@ -1,70 +1,90 @@
-// Removed supabase import
+import mongoose from 'mongoose';
+import Course from '../models/Course.js';
+import Enrollment from '../models/Enrollment.js';
+
+const getCourseId = (value) => {
+  if (value && typeof value === 'object') {
+    return value._id || value.id || value.courseId || value.course_id;
+  }
+  return value;
+};
 
 export const getEnrollments = async (req, res) => {
-  const userId = req.user?.id;
   try {
-    const { data: enrollments, error } = await supabase
-      .from('enrollments')
-      .select('*, courses(*)')
-      .eq('user_id', userId);
-
-    if (error) throw error;
-    res.json({ success: true, data: enrollments || [] });
+    const enrollments = await Enrollment.model
+      .find({ userId: req.user.id, status: { $in: ['active', 'completed'] } })
+      .populate('courseId')
+      .sort({ updatedAt: -1 })
+      .lean();
+    return res.json({ success: true, data: enrollments });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: error.message });
   }
 };
 
 export const createEnrollment = async (req, res) => {
-  const userId = req.user?.id;
-  const { courseId } = req.body;
+  const courseId = getCourseId(req.body.courseId);
+  const userId = req.user.id;
+
+  if (!mongoose.isValidObjectId(courseId)) {
+    return res.status(400).json({ success: false, message: 'A valid course ID is required.' });
+  }
 
   try {
-    const { data: enrollment, error } = await supabase
-      .from('enrollments')
-      .insert([{ user_id: userId, course_id: courseId }])
-      .select()
-      .single();
+    const course = await Course.model.findById(courseId).select('price').lean();
+    if (!course) {
+      return res.status(404).json({ success: false, message: 'Course not found.' });
+    }
+    if (Number(course.price) !== 0) {
+      return res.status(403).json({
+        success: false,
+        message: 'Paid courses must be purchased through the cart checkout flow.',
+      });
+    }
 
-    if (error) throw error;
-    res.status(201).json({ success: true, data: enrollment });
+    const enrollment = await Enrollment.model.findOneAndUpdate(
+      { userId, courseId },
+      { $set: { status: 'active' }, $setOnInsert: { userId, courseId } },
+      { new: true, upsert: true, runValidators: true }
+    ).populate('courseId');
+
+    return res.status(201).json({ success: true, data: enrollment });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: error.message });
   }
 };
 
-export const createOrder = async (req, res) => {
-  const userId = req.user?.id;
-  const { courseId, amount } = req.body;
-  const orderId = `ORD-${Date.now()}`;
-  res.json({ success: true, data: { orderId, amount: amount || 499 } });
-};
+export const createOrder = async (_req, res) => res.status(410).json({
+  success: false,
+  message: 'Use the cart checkout flow to create an order.',
+});
 
-export const verifyPayment = async (req, res) => {
-  res.json({ success: true, message: 'Payment verified' });
-};
+export const verifyPayment = async (_req, res) => res.status(410).json({
+  success: false,
+  message: 'Payments are verified through the cart checkout flow.',
+});
 
-export const enrollFree = async (req, res) => {
-  return createEnrollment(req, res);
-};
-
-export const getMyCourses = async (req, res) => {
-  return getEnrollments(req, res);
-};
+export const enrollFree = (req, res) => createEnrollment(req, res);
+export const getMyCourses = (req, res) => getEnrollments(req, res);
 
 export const getEnrollmentStatus = async (req, res) => {
-  const { courseId } = req.params;
-  const userId = req.user?.id;
-  try {
-    const { data: enrolled } = await supabase
-      .from('enrollments')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('course_id', courseId)
-      .maybeSingle();
+  const courseId = getCourseId(req.params.courseId);
+  if (!mongoose.isValidObjectId(courseId)) {
+    return res.status(400).json({ success: false, message: 'A valid course ID is required.' });
+  }
 
-    res.json({ success: true, isEnrolled: !!enrolled });
+  try {
+    const enrolled = await Enrollment.model.exists({
+      userId: req.user.id,
+      courseId,
+      status: { $in: ['active', 'completed'] },
+    });
+    return res.json({
+      success: true,
+      enrolled: Boolean(enrolled),
+      isEnrolled: Boolean(enrolled),
+    });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: error.message });
   }
 };
